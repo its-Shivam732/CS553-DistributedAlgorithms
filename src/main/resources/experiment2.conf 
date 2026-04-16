@@ -1,0 +1,17 @@
+include "application.conf"
+
+sim {
+  graphFile = "src/main/resources/graphs/MediumGraph.ngs"
+  seed = 123
+  runDurationSeconds = 60
+
+  traffic {
+    tickIntervalMs = 50
+    defaultPdf = [
+      { msg = "PING",   p = 0.40 },
+      { msg = "GOSSIP", p = 0.30 },
+      { msg = "WORK",   p = 0.30 }
+    ]
+    perNodePdf = []
+  }
+}

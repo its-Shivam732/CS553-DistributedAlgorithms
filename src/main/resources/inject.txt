@@ -1,0 +1,14 @@
+# Injection script for CS553 simulation
+# Format: delayMs=<ms>,node=<id>,kind=<TYPE>,payload=<text>
+
+# Inject WORK into node 1 after 100ms
+delayMs=100,node=1,kind=WORK,payload=task-001
+
+# Inject PING into node 2 after 200ms
+delayMs=200,node=2,kind=PING,payload=probe-001
+
+# Inject GOSSIP into node 1 after 500ms
+delayMs=500,node=1,kind=GOSSIP,payload=update-001
+
+# Inject more WORK after 1 second
+delayMs=1000,node=2,kind=WORK,payload=task-002

@@ -1,0 +1,18 @@
+include "application.conf"
+
+sim {
+  graphFile = "src/main/resources/graphs/LargeGraph.ngs"
+  seed = 999
+  runDurationSeconds = 120
+
+  traffic {
+    tickIntervalMs = 20
+    defaultPdf = [
+      { msg = "PING",   p = 0.30 },
+      { msg = "GOSSIP", p = 0.20 },
+      { msg = "WORK",   p = 0.40 },
+      { msg = "ACK",    p = 0.10 }
+    ]
+    perNodePdf = []
+  }
+}

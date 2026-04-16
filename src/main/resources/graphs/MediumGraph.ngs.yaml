@@ -1,0 +1,17 @@
+Nodes:
+	Modified: [20, 24, 44, 19, 7]
+	Removed: [47, 3]
+	Added:
+		40: 51
+Edges:
+	Modified:
+		22: 23
+	Added:
+		22: 23
+		40: 51
+	Removed:
+		22: 23
+		44: 47
+		47: 46
+		49: 3
+		3: 12
