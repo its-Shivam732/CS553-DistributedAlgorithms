@@ -94,17 +94,17 @@ object SimMain:
     nodeRefs
 
   private def parseArgs(args: Array[String]): Map[String, String] =
-    val result = scala.collection.mutable.Map[String, String]()
-    var i = 0
-    while i < args.length do
-      val arg = args(i)
-      if arg.startsWith("--") then
-        if i + 1 < args.length && !args(i + 1).startsWith("--") then
-          result(arg) = args(i + 1)
-          i += 2
-        else
-          result(arg) = ""
-          i += 1
-      else
-        i += 1
-    result.toMap
+    @annotation.tailrec
+    def loop(remaining: List[String], acc: Map[String, String]): Map[String, String] =
+      remaining match
+        case Nil => acc
+        case arg :: rest if arg.startsWith("--") =>
+          rest match
+            case value :: tail if !value.startsWith("--") =>
+              loop(tail, acc + (arg -> value))
+            case _ =>
+              loop(rest, acc + (arg -> ""))
+        case _ :: rest =>
+          loop(rest, acc)
+
+    loop(args.toList, Map.empty)

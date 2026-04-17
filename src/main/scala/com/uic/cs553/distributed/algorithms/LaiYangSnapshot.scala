@@ -1,8 +1,7 @@
 package com.uic.cs553.distributed.algorithms
 
-import com.uic.cs553.distributed.simruntimeakka.{
-  DistributedAlgorithm, NodeContext
-}
+import com.uic.cs553.distributed.simruntimeakka.{DistributedAlgorithm, NodeContext}
+import com.uic.cs553.distributed.simcore.MessageType
 import LaiYangMessages.*
 import LaiYangMessages.Color.*
 import org.slf4j.LoggerFactory
@@ -11,152 +10,122 @@ import java.util.UUID
 /**
  * Lai-Yang Snapshot Algorithm Implementation.
  *
- * Takes a consistent global snapshot of a distributed system
- * with NON-FIFO channels — unlike Chandy-Lamport which requires FIFO.
+ * Takes a consistent global snapshot with NON-FIFO channels.
+ * Uses RED/WHITE coloring instead of channel markers.
  *
- * Key insight: use COLORING (white/red) instead of markers on channels.
- * Every message carries the sender's color when sent.
- * This lets receivers determine which messages are "pre-snapshot"
- * and which are "post-snapshot" without needing FIFO ordering.
- *
- * Algorithm:
- * 1. Initiator turns RED, records local state
- * 2. Sends SnapshotMarker to all neighbors
- * 3. Any WHITE node receiving a marker turns RED and records state
- * 4. WHITE messages arriving at RED nodes = in-flight, captured
- * 5. When all nodes RED and all channels drained = snapshot complete
- *
- * System assumptions (required by course spec):
- * - NON-FIFO asynchronous channels (stronger than Chandy-Lamport)
+ * System assumptions:
+ * - NON-FIFO asynchronous channels
  * - Messages carry color of sender
  * - No process failures during snapshot
  * - General graph topology
- *
- * @param isInitiator true for the node that triggers the snapshot
  */
-class LaiYangSnapshot(isInitiator: Boolean = false)
+class LaiYangSnapshot(val isInitiator: Boolean = false)
   extends DistributedAlgorithm:
 
   override val name: String = "LaiYangSnapshot"
   private val logger = LoggerFactory.getLogger(s"$name")
 
-  // ── Algorithm state (per node) ───────────────────────────────
-  // justified: single-threaded actor access, no sharing
-  private var color:            Color            = WHITE
-  private var snapshotId:       String           = ""
-  private var localState:       Map[String, String] = Map.empty
-  private var inFlightMessages: List[String]     = List.empty
-  private var pendingRed:       Int              = 0  // neighbors still WHITE
-  private var messagesSentWhite: Map[Int, Int]   = Map.empty  // channel → count
-  private var messagesRecvWhite: Map[Int, Int]   = Map.empty  // channel → count
-  private var snapshotDone:     Boolean          = false
+  // ── Immutable state model ────────────────────────────────────
+  private case class SnapState(
+                                color:             Color               = WHITE,
+                                snapshotId:        String              = "",
+                                localState:        Map[String, String] = Map.empty,
+                                inFlightMessages:  List[String]        = List.empty,
+                                pendingRed:        Int                 = 0,
+                                messagesSentWhite: Map[Int, Int]       = Map.empty,
+                                messagesRecvWhite: Map[Int, Int]       = Map.empty,
+                                snapshotDone:      Boolean             = false
+                              )
+
+  // Single mutable reference to immutable state record
+  // justified: owned by one actor, single-threaded access
+  private var state: SnapState = SnapState()
 
   override def onStart(ctx: NodeContext): Unit =
-    // Initialize message counters for all channels
-    messagesSentWhite = ctx.neighbors.map(_ -> 0).toMap
-    messagesRecvWhite = ctx.neighbors.map(_ -> 0).toMap
+    // Initialize per-channel counters
+    val counters = ctx.neighbors.map(_ -> 0).toMap
+    state = state.copy(
+      messagesSentWhite = counters,
+      messagesRecvWhite = counters
+    )
 
     if isInitiator then
       logger.info(s"Node ${ctx.nodeId}: initiating snapshot")
-      // Small delay to let background traffic build up
-      // so there are in-flight messages to capture
       initiateSnapshot(ctx)
 
   override def onMessage(ctx: NodeContext, msg: Any): Unit =
     msg match
-      case SnapshotMarker(id, from) =>
-        handleMarker(ctx, id, from)
-
-      case ColoredMessage(from, payload, senderColor) =>
-        handleColoredMessage(ctx, from, payload, senderColor)
-
-      case _ =>
-        // Track white messages on channels for in-flight detection
-        if color == WHITE then
-          messagesRecvWhite = messagesRecvWhite.updatedWith(
-            // extract from ID from payload if possible
-            -1
-          )(_.map(_ + 1).orElse(Some(1)))
+      case env: com.uic.cs553.distributed.simruntimeakka.NodeActor.Envelope =>
+        val payload = env.payload
+        if payload.startsWith("SNAPSHOT_MARKER:") then
+          val parts = payload.split(":")
+          handleMarker(ctx, id = parts(1), from = parts(2).toInt)
+        else if state.color == RED then
+          // WHITE message arriving at RED node = in-flight, capture it
+          val newInFlight = s"from=${env.from} payload=$payload" :: state.inFlightMessages
+          logger.info(s"Node ${ctx.nodeId}: captured in-flight message from ${env.from}")
+          state = state.copy(inFlightMessages = newInFlight)
+        else
+          // Track white messages received per channel
+          val updated = state.messagesRecvWhite.updatedWith(env.from)(
+            _.map(_ + 1).orElse(Some(1))
+          )
+          state = state.copy(messagesRecvWhite = updated)
+      case _ => ()
 
   override def onTick(ctx: NodeContext): Unit =
-    // Periodically check if snapshot is complete
-    if color == RED && !snapshotDone then
+    if state.color == RED && !state.snapshotDone then
       checkSnapshotComplete(ctx)
 
   // ── Private handlers ────────────────────────────────────────
 
   private def initiateSnapshot(ctx: NodeContext): Unit =
-    snapshotId = UUID.randomUUID().toString.take(8)
+    val snapId = UUID.randomUUID().toString.take(8)
+    state = state.copy(snapshotId = snapId)
     recordLocalState(ctx)
     turnRed(ctx)
 
   private def recordLocalState(ctx: NodeContext): Unit =
-    // Capture this node's current state
-    localState = Map(
-      "nodeId"          -> ctx.nodeId.toString,
-      "color"           -> color.toString,
-      "neighbors"       -> ctx.neighbors.mkString(","),
-      "snapshotId"      -> snapshotId,
-      "timestampMs"     -> System.currentTimeMillis().toString,
-      "messagesSentWhite" -> messagesSentWhite.values.sum.toString
+    val captured = Map(
+      "nodeId"             -> ctx.nodeId.toString,
+      "color"              -> state.color.toString,
+      "neighbors"          -> ctx.neighbors.mkString(","),
+      "snapshotId"         -> state.snapshotId,
+      "timestampMs"        -> System.currentTimeMillis().toString,
+      "messagesSentWhite"  -> state.messagesSentWhite.values.sum.toString
     )
-    logger.info(s"Node ${ctx.nodeId}: recorded local state at snapshot $snapshotId")
+    logger.info(s"Node ${ctx.nodeId}: recorded local state at snapshot ${state.snapshotId}")
+    state = state.copy(localState = captured)
 
   private def turnRed(ctx: NodeContext): Unit =
-    color = RED
-    pendingRed = ctx.neighbors.size
+    state = state.copy(
+      color      = RED,
+      pendingRed = ctx.neighbors.size
+    )
     logger.info(s"Node ${ctx.nodeId}: turned RED, sending markers to ${ctx.neighbors}")
-
-    // Send snapshot marker to all neighbors
     ctx.neighbors.foreach: to =>
-      ctx.send(
-        to,
-        com.uic.cs553.distributed.simcore.MessageType.CONTROL,
-        s"SNAPSHOT_MARKER:$snapshotId:${ctx.nodeId}"
-      )
+      ctx.send(to, MessageType.CONTROL,
+        s"SNAPSHOT_MARKER:${state.snapshotId}:${ctx.nodeId}")
 
   private def handleMarker(ctx: NodeContext, id: String, from: Int): Unit =
-    snapshotId = id
-    if color == WHITE then
-      // First marker received — take snapshot and turn red
+    state = state.copy(snapshotId = id)
+
+    if state.color == WHITE then
       logger.info(s"Node ${ctx.nodeId}: received first marker from $from, taking snapshot")
       recordLocalState(ctx)
       turnRed(ctx)
 
-    // Record that this neighbor is now RED
-    pendingRed = math.max(0, pendingRed - 1)
-    logger.info(s"Node ${ctx.nodeId}: marker from $from, pendingRed=$pendingRed")
+    val newPending = math.max(0, state.pendingRed - 1)
+    state = state.copy(pendingRed = newPending)
+    logger.info(s"Node ${ctx.nodeId}: marker from $from, pendingRed=$newPending")
     checkSnapshotComplete(ctx)
 
-  private def handleColoredMessage(
-                                    ctx:         NodeContext,
-                                    from:        Int,
-                                    payload:     String,
-                                    senderColor: Color
-                                  ): Unit =
-    // Track received white messages per channel
-    if senderColor == WHITE then
-      messagesRecvWhite = messagesRecvWhite.updatedWith(from)(
-        _.map(_ + 1).orElse(Some(1))
-      )
-
-    // If WE are RED and message is WHITE → it's an in-flight message
-    // Must capture it as part of channel state
-    if color == RED && senderColor == WHITE then
-      inFlightMessages = s"from=$from payload=$payload" :: inFlightMessages
-      logger.info(s"Node ${ctx.nodeId}: captured in-flight message from $from")
-
   private def checkSnapshotComplete(ctx: NodeContext): Unit =
-    if !snapshotDone && color == RED && pendingRed == 0 then
-      snapshotDone = true
-      val snapshot = LocalSnapshot(
-        snapshotId       = snapshotId,
-        nodeId           = ctx.nodeId,
-        localState       = localState,
-        inFlightMessages = inFlightMessages
-      )
+    if !state.snapshotDone && state.color == RED && state.pendingRed == 0 then
+      state = state.copy(snapshotDone = true)
       logger.info(
         s"Node ${ctx.nodeId}: snapshot COMPLETE. " +
-          s"State=$localState " +
-          s"InFlight=${inFlightMessages.size} messages"
+          s"snapshotId=${state.snapshotId} " +
+          s"State=${state.localState} " +
+          s"InFlight=${state.inFlightMessages.size} messages"
       )

@@ -106,14 +106,15 @@ class SimConfig(config: Config = ConfigFactory.load()):
 
   def withOverrides(
                      graphFile: Option[String] = None,
-                     runSecs:   Option[Int]    = None
+                     runSecs: Option[Int] = None
                    ): SimConfig =
-    var cfg = config
-    graphFile.foreach: g =>
-      cfg = cfg.withValue("sim.graphFile", ConfigValueFactory.fromAnyRef(g))
-    runSecs.foreach: s =>
-      cfg = cfg.withValue("sim.runDurationSeconds", ConfigValueFactory.fromAnyRef(s))
-    new SimConfig(cfg)
+    val cfg1 = graphFile.fold(config)(g =>
+      config.withValue("sim.graphFile", ConfigValueFactory.fromAnyRef(g))
+    )
+    val cfg2 = runSecs.fold(cfg1)(s =>
+      cfg1.withValue("sim.runDurationSeconds", ConfigValueFactory.fromAnyRef(s))
+    )
+    new SimConfig(cfg2)
 
 
 object SimConfig:

@@ -25,12 +25,14 @@ class PdfSampler(seed: Long):
    */
   def sample(pdf: NodePdf): MessageType =
     val roll = rng.nextDouble()
-    var cumulative = 0.0
     pdf.weights
-      .find: (kind, prob) =>
-        cumulative += prob
-        roll <= cumulative
-      .map(_._1)
+      .toList
+      .scanLeft(0.0): (cum, entry) =>
+        cum + entry._2
+      .zip(pdf.weights.toList.map(_._1))
+      .drop(1)
+      .find((cum, _) => roll <= cum)
+      .map(_._2)
       .getOrElse(pdf.weights.keys.last)
 
   /**

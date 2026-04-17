@@ -1,51 +1,43 @@
 package com.uic.cs553.distributed.algorithms
 
-import com.uic.cs553.distributed.simruntimeakka.{
-  DistributedAlgorithm, NodeContext
-}
-import WaveMessages.*
+import com.uic.cs553.distributed.simruntimeakka.{DistributedAlgorithm, NodeContext}
+import com.uic.cs553.distributed.simcore.MessageType
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
 /**
- * Wave Algorithm Implementation.
+ * Wave Algorithm Implementation (Echo Algorithm variant).
  *
- * A wave is a distributed computation where:
- * 1. Every node participates exactly once
- * 2. There is at least one "decision" event (at the initiator)
- * 3. The wave has a defined termination
- *
- * This implements the Echo Algorithm variant of wave algorithms:
- * - Initiator sends Wave to all neighbors
- * - Internal nodes forward Wave, collect Acks from all children
- * - Leaf nodes immediately Ack
- * - Initiator decides when all Acks received
- *
- * System assumptions (required by course spec):
+ * System assumptions:
  * - Asynchronous message passing
  * - Reliable channels (no message loss)
- * - General graph topology (not restricted to ring or tree)
+ * - General graph topology
  * - No process failures
  *
- * @param isInitiator true for the node that starts the wave
+ * State is immutable — transitions modeled as replacing the
+ * entire state object rather than mutating fields.
  */
-class WaveAlgorithm(isInitiator: Boolean = false)
+class WaveAlgorithm(val isInitiator: Boolean = false)
   extends DistributedAlgorithm:
 
   override val name: String = "WaveAlgorithm"
   private val logger = LoggerFactory.getLogger(s"$name")
 
-  // ── Algorithm state (per node) ───────────────────────────────
-  // justified: single-threaded actor access, no sharing
-  private var phase:       Phase        = Phase.IDLE
-  private var parent:      Option[Int]  = None
-  private var pendingAcks: Int          = 0
-  private var waveId:      String       = ""
-  private var visited:     Set[Int]     = Set.empty
-  private var startTime:   Long         = 0L
-
+  // ── Immutable state model ────────────────────────────────────
   enum Phase:
     case IDLE, ACTIVE, DONE
+
+  private case class WaveState(
+                                phase:       Phase        = Phase.IDLE,
+                                parent:      Option[Int]  = None,
+                                pendingAcks: Int          = 0,
+                                waveId:      String       = "",
+                                startTime:   Long         = 0L
+                              )
+
+  // Single mutable reference to immutable state record
+  // justified: DistributedAlgorithm lifecycle is owned by one actor
+  private var state: WaveState = WaveState()
 
   override def onStart(ctx: NodeContext): Unit =
     if isInitiator then
@@ -54,86 +46,81 @@ class WaveAlgorithm(isInitiator: Boolean = false)
 
   override def onMessage(ctx: NodeContext, msg: Any): Unit =
     msg match
-      case Wave(id, from) =>
-        handleWave(ctx, id, from)
-
-      case WaveAck(id, from) =>
-        handleAck(ctx, id, from)
-
-      case _ => () // ignore non-wave messages
+      case env: com.uic.cs553.distributed.simruntimeakka.NodeActor.Envelope =>
+        val payload = env.payload
+        if payload.startsWith("WAVE:") && !payload.startsWith("WAVEACK:") then
+          val parts = payload.split(":")
+          handleWave(ctx, id = parts(1), from = parts(2).toInt)
+        else if payload.startsWith("WAVEACK:") then
+          val parts = payload.split(":")
+          handleAck(ctx, id = parts(1), from = parts(2).toInt)
+      case _ => ()
 
   override def onTick(ctx: NodeContext): Unit = ()
 
   // ── Private handlers ────────────────────────────────────────
 
   private def startWave(ctx: NodeContext): Unit =
-    waveId    = UUID.randomUUID().toString.take(8)
-    phase     = Phase.ACTIVE
-    parent    = None  // initiator has no parent
-    startTime = System.currentTimeMillis()
-    visited   = Set(ctx.nodeId)
-
+    val waveId    = UUID.randomUUID().toString.take(8)
     val neighbors = ctx.neighbors.toList
+
     if neighbors.isEmpty then
-      // Lone node — wave immediately complete
       logger.info(s"Node ${ctx.nodeId}: wave $waveId complete (no neighbors)")
-      phase = Phase.DONE
+      state = WaveState(phase = Phase.DONE, waveId = waveId)
     else
-      pendingAcks = neighbors.size
+      state = WaveState(
+        phase       = Phase.ACTIVE,
+        parent      = None,
+        pendingAcks = neighbors.size,
+        waveId      = waveId,
+        startTime   = System.currentTimeMillis()
+      )
       logger.info(s"Node ${ctx.nodeId}: sending wave $waveId to $neighbors")
       neighbors.foreach: to =>
-        ctx.send(to, com.uic.cs553.distributed.simcore.MessageType.CONTROL,
-          s"WAVE:$waveId:${ctx.nodeId}")
+        ctx.send(to, MessageType.CONTROL, s"WAVE:$waveId:${ctx.nodeId}")
 
   private def handleWave(ctx: NodeContext, id: String, from: Int): Unit =
-    phase match
+    state.phase match
       case Phase.IDLE =>
-        // First time receiving wave — become active
-        waveId  = id
-        phase   = Phase.ACTIVE
-        parent  = Some(from)
-        visited = Set(ctx.nodeId)
-
-        // Forward to all neighbors EXCEPT parent
         val forwardTo = ctx.neighbors.filterNot(_ == from).toList
         logger.info(s"Node ${ctx.nodeId}: received wave $id from $from, forwarding to $forwardTo")
 
         if forwardTo.isEmpty then
-          // Leaf node — immediately ack parent
           logger.info(s"Node ${ctx.nodeId}: leaf node, acking parent $from")
-          ctx.send(from, com.uic.cs553.distributed.simcore.MessageType.CONTROL,
-            s"WAVEACK:$id:${ctx.nodeId}")
-          phase = Phase.DONE
+          ctx.send(from, MessageType.CONTROL, s"WAVEACK:$id:${ctx.nodeId}")
+          state = WaveState(phase = Phase.DONE, waveId = id, parent = Some(from))
         else
-          pendingAcks = forwardTo.size
+          state = WaveState(
+            phase       = Phase.ACTIVE,
+            parent      = Some(from),
+            pendingAcks = forwardTo.size,
+            waveId      = id,
+            startTime   = System.currentTimeMillis()
+          )
           forwardTo.foreach: to =>
-            ctx.send(to, com.uic.cs553.distributed.simcore.MessageType.CONTROL,
-              s"WAVE:$id:${ctx.nodeId}")
+            ctx.send(to, MessageType.CONTROL, s"WAVE:$id:${ctx.nodeId}")
 
       case Phase.ACTIVE | Phase.DONE =>
-        // Already seen this wave — send ack immediately
-        ctx.send(from, com.uic.cs553.distributed.simcore.MessageType.CONTROL,
-          s"WAVEACK:$id:${ctx.nodeId}")
+        ctx.send(from, MessageType.CONTROL, s"WAVEACK:$id:${ctx.nodeId}")
 
   private def handleAck(ctx: NodeContext, id: String, from: Int): Unit =
-    if id != waveId then return  // stale ack from old wave
+    if id != state.waveId then return
 
-    pendingAcks -= 1
-    logger.info(s"Node ${ctx.nodeId}: got ack from $from, pending=$pendingAcks")
+    val newPending = state.pendingAcks - 1
+    logger.info(s"Node ${ctx.nodeId}: got ack from $from, pending=$newPending")
 
-    if pendingAcks == 0 then
-      phase match
-        case Phase.ACTIVE if parent.isEmpty =>
-          // Initiator — wave complete!
-          val duration = System.currentTimeMillis() - startTime
-          logger.info(s"Node ${ctx.nodeId}: WAVE COMPLETE! waveId=$waveId, duration=${duration}ms")
-          phase = Phase.DONE
+    if newPending == 0 then
+      state.phase match
+        case Phase.ACTIVE if state.parent.isEmpty =>
+          val duration = System.currentTimeMillis() - state.startTime
+          logger.info(s"Node ${ctx.nodeId}: WAVE COMPLETE! waveId=${state.waveId}, duration=${duration}ms")
+          state = state.copy(phase = Phase.DONE, pendingAcks = 0)
 
         case Phase.ACTIVE =>
-          // Internal node — propagate ack to parent
-          parent.foreach: p =>
-            ctx.send(p, com.uic.cs553.distributed.simcore.MessageType.CONTROL,
-              s"WAVEACK:$waveId:${ctx.nodeId}")
-          phase = Phase.DONE
+          state.parent.foreach: p =>
+            ctx.send(p, MessageType.CONTROL, s"WAVEACK:${state.waveId}:${ctx.nodeId}")
+          state = state.copy(phase = Phase.DONE, pendingAcks = 0)
 
         case _ => ()
+    else
+      state = state.copy(pendingAcks = newPending)

@@ -41,15 +41,17 @@ object InteractiveInjector:
     println("Type 'nodes' to list available nodes")
     println("==================================\n")
 
-    var running = true
-    while running do
+    @annotation.tailrec
+    def loop(): Unit =
       print("> ")
       val line = StdIn.readLine()
       if line == null || line.trim == "quit" || line.trim == "exit" then
-        running = false
         println("Exiting interactive mode.")
       else
         processCommand(line.trim, nodeRefs)
+        loop()
+
+    loop()
 
   /**
    * Process one command line from stdin.
