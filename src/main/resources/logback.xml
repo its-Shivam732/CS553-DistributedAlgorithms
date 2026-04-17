@@ -1,15 +1,43 @@
 <configuration>
+
+    <!-- Console appender (existing) -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %-40logger{40} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <logger name="akka.actor" level="INFO" />
-    <logger name="akka.event" level="INFO" />
-    <logger name="com.uic.cs553" level="INFO" />
+    <!-- File appender — writes to logs/simulation.log -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/simulation.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- New log file per day, keep 7 days -->
+            <fileNamePattern>logs/simulation.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-40logger{40} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Per-experiment file appender — name comes from system property -->
+    <!-- Usage: sbt -Dlog.file=outputs/exp1.log "runMain ..." -->
+    <appender name="EXP_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${log.file:-logs/experiment.log}</file>
+        <append>false</append>  <!-- overwrite each run -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %-40logger{40} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="akka.actor" level="INFO"/>
+    <logger name="akka.event" level="INFO"/>
+    <logger name="com.uic.cs553" level="INFO"/>
 
     <root level="INFO">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="EXP_FILE"/>
     </root>
+
 </configuration>

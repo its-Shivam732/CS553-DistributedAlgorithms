@@ -12,17 +12,17 @@ object ActorSystemBootstrap:
   private val logger = LoggerFactory.getLogger(getClass)
 
   /**
-   * Boot the simulation and return node refs + system.
-   * Caller is responsible for running duration and shutdown.
-   * This allows SimMain to inject messages WHILE simulation runs.
+   * Boot the simulation using the provided config.
+   * Config is passed in from SimMain so CLI overrides
+   * (--graph, --run) are respected correctly.
    */
   def boot(
-            algorithms: Map[Int, List[DistributedAlgorithm]] = Map.empty
+            algorithms: Map[Int, List[DistributedAlgorithm]] = Map.empty,
+            config:     SimConfig = SimConfig()   // ← accept config, default to standard load
           ): (Map[Int, ActorRef], ActorSystem, MetricsCollector) =
 
     logger.info("=== Simulation Starting ===")
 
-    val config  = SimConfig()
     val sampler = PdfSampler(config.seed)
     logger.info(s"Config loaded: graph=${config.graphFile}, seed=${config.seed}")
 

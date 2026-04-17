@@ -4,6 +4,9 @@ scalaVersion := "3.3.1"
 
 lazy val akkaVersion = "2.8.5"
 
+fork := true
+javaOptions ++= Seq(s"-Dlog.file=${sys.props.getOrElse("log.file", "logs/experiment.log")}")
+
 resolvers += "Akka library repository".at("https://repo.akka.io/_WDATKeuw2KJzDOl0RZrscTCl5Thulje4speeo8XgpEKTRpT/secure")
 
 enablePlugins(Cinnamon)
