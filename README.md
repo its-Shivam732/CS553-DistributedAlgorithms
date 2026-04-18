@@ -1,5 +1,5 @@
 # CS553 Distributed Algorithms Simulator
-**Youtube video:** https://www.youtube.com/watch?v=FNe1j0h5-68
+# Youtube video: https://www.youtube.com/watch?v=FNe1j0h5-68
 
 ---
 
