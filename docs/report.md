@@ -1,10 +1,6 @@
 # CS553 Project Report — Distributed Algorithms Simulator
 
-**Student:** Shivam Moudgil | **UIN:** 665599956  
-**Course:** CS553 — Distributed Computing Systems, Spring 2026  
-**Assigned Algorithms:** Wave Algorithm (Index 13) · Lai-Yang Snapshot (Index 23)  
-**Submission:** April 18, 2026
-
+**Student:** Shivam Moudgil 
 ---
 
 ## 1. System Overview
