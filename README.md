@@ -485,15 +485,16 @@ The Lightbend Cinnamon sbt plugin (v2.21.4) is configured in `project/plugins.sb
 
 ## Versions
 
-| Component | Version |
-|-----------|---------|
-| Scala | 3.3.1 |
-| Akka Classic | 2.8.5 |
-| sbt | 1.9.7 |
-| Java | 17 (required) |
-| ScalaTest | 3.2.17 |
-| Logback | 1.4.11 |
-| Circe (JSON) | 0.14.6 |
-| Typesafe Config | 1.4.2 |
-| Cinnamon plugin | 2.21.4 |
-| NetGameSim | Submodule @ 0x1DOCD00D/NetGameSim |
+| Component | Version | Source in build.sbt |
+|-----------|---------|---------------------|
+| Scala | 3.3.1 | `scalaVersion` |
+| Akka Classic | 2.8.5 | `akka-actor` |
+| Akka Typed | 2.8.5 | `akka-actor-typed`, `akka-cluster-typed` |
+| sbt | 1.9.7 | toolchain |
+| Java | 17 (required) | `fork := true` |
+| ScalaTest | 3.2.17 | `scalatest % Test` |
+| Logback | 1.4.11 | `logback-classic` |
+| Circe (JSON) | 0.14.6 | `circe-core/generic/parser` |
+| Typesafe Config | 1.4.2 | `config` |
+| Cinnamon plugin | 2.21.4 | `project/plugins.sbt` |
+| NetGameSim | unmanaged JAR | `netgamesim/target/scala-3.2.2/netmodelsim.jar` |
