@@ -1,0 +1,303 @@
+18:42:43.205 [main] INFO  c.uic.cs553.distributed.simcli.SimMain$  - === CS553 Distributed Algorithms Simulator ===
+18:42:43.241 [main] INFO  c.uic.cs553.distributed.simcli.SimMain$  - Args: --graph src/main/resources/graphs/SmallGraph.ngs --run 5s --no-algorithms --save-graph outputs/smallgraph-enriched.json
+18:42:43.305 [main] INFO  c.uic.cs553.distributed.simcli.SimMain$  - Graph: src/main/resources/graphs/SmallGraph.ngs
+18:42:43.306 [main] INFO  c.uic.cs553.distributed.simcli.SimMain$  - Duration: 5 seconds
+18:42:43.306 [main] INFO  c.uic.cs553.distributed.simcli.SimMain$  - Wave algorithm: false
+18:42:43.306 [main] INFO  c.uic.cs553.distributed.simcli.SimMain$  - Lai-Yang snapshot: false
+18:42:43.306 [main] INFO  c.u.c.distributed.simcore.GraphLoader$   - Loading graph from: /Users/moudgil/CS553_2026/src/main/resources/graphs/SmallGraph.ngs
+18:42:43.325 [main] INFO  c.u.c.distributed.simcore.GraphLoader$   - Deserialized 21 nodes, 20 edges
+18:42:43.328 [main] INFO  c.u.c.distributed.simcore.GraphLoader$   - Loaded: SimGraph(nodes=21, edges=20)
+18:42:43.328 [main] INFO  c.u.c.distributed.simcore.GraphEnricher$ - Enriching graph: SimGraph(nodes=21, edges=20)
+18:42:43.331 [main] INFO  c.u.c.distributed.simcore.GraphEnricher$ - Assigned 20 edge labels
+18:42:43.331 [main] INFO  c.u.c.distributed.simcore.GraphEnricher$ - Assigned 21 node PDFs
+18:42:43.331 [main] INFO  c.uic.cs553.distributed.simcli.SimMain$  - Saving enriched graph with edge labels to: outputs/smallgraph-enriched.json
+18:42:43.331 [main] INFO  c.u.c.d.simcore.GraphSerializer$         - Saving enriched graph to: outputs/smallgraph-enriched.json
+18:42:43.373 [main] INFO  c.u.c.d.simcore.GraphSerializer$         - Saved enriched graph to: outputs/smallgraph-enriched.json
+18:42:43.373 [main] INFO  c.uic.cs553.distributed.simcli.SimMain$  - Edge label visualization saved to: outputs/smallgraph-enriched.json
+18:42:43.375 [main] INFO  c.u.c.d.s.ActorSystemBootstrap$          - === Simulation Starting ===
+18:42:43.375 [main] INFO  c.u.c.d.s.ActorSystemBootstrap$          - Config loaded: graph=src/main/resources/graphs/SmallGraph.ngs, seed=999
+18:42:43.375 [main] INFO  c.u.c.distributed.simcore.GraphLoader$   - Loading graph from: src/main/resources/graphs/SmallGraph.ngs
+18:42:43.382 [main] INFO  c.u.c.distributed.simcore.GraphLoader$   - Deserialized 21 nodes, 20 edges
+18:42:43.382 [main] INFO  c.u.c.distributed.simcore.GraphLoader$   - Loaded: SimGraph(nodes=21, edges=20)
+18:42:43.382 [main] INFO  c.u.c.distributed.simcore.GraphEnricher$ - Enriching graph: SimGraph(nodes=21, edges=20)
+18:42:43.383 [main] INFO  c.u.c.distributed.simcore.GraphEnricher$ - Assigned 20 edge labels
+18:42:43.383 [main] INFO  c.u.c.distributed.simcore.GraphEnricher$ - Assigned 21 node PDFs
+18:42:43.383 [main] INFO  c.u.c.d.s.ActorSystemBootstrap$          - Graph enriched: SimGraph(nodes=21, edges=20)
+18:42:43.491 [sim-akka.actor.default-dispatcher-6] INFO  akka.event.slf4j.Slf4jLogger             - Slf4jLogger started
+18:42:43.623 [main] INFO  c.u.c.d.s.ActorSystemBootstrap$          - ActorSystem created
+18:42:43.623 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Creating 21 actors
+18:42:43.627 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Created 21 actors
+18:42:43.629 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 0: 2 neighbors, timer=true
+18:42:43.629 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 1: 1 neighbors, timer=true
+18:42:43.629 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 2: 1 neighbors, timer=false
+18:42:43.629 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 initialized: 2 neighbors, timerEnabled=true
+18:42:43.629 [sim-akka.actor.default-dispatcher-11] INFO  Node-1                                   - Node 1 initialized: 1 neighbors, timerEnabled=true
+18:42:43.630 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 3: 0 neighbors, timer=false
+18:42:43.630 [sim-akka.actor.default-dispatcher-7] INFO  Node-3                                   - Node 3 initialized: 0 neighbors, timerEnabled=false
+18:42:43.630 [sim-akka.actor.default-dispatcher-10] INFO  Node-2                                   - Node 2 initialized: 1 neighbors, timerEnabled=false
+18:42:43.630 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 4: 1 neighbors, timer=false
+18:42:43.630 [sim-akka.actor.default-dispatcher-6] INFO  Node-4                                   - Node 4 initialized: 1 neighbors, timerEnabled=false
+18:42:43.630 [sim-akka.actor.default-dispatcher-9] INFO  Node-5                                   - Node 5 initialized: 1 neighbors, timerEnabled=false
+18:42:43.630 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 5: 1 neighbors, timer=false
+18:42:43.630 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 6: 1 neighbors, timer=false
+18:42:43.630 [sim-akka.actor.default-dispatcher-8] INFO  Node-6                                   - Node 6 initialized: 1 neighbors, timerEnabled=false
+18:42:43.630 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 7: 1 neighbors, timer=false
+18:42:43.630 [sim-akka.actor.default-dispatcher-7] INFO  Node-7                                   - Node 7 initialized: 1 neighbors, timerEnabled=false
+18:42:43.630 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 8: 1 neighbors, timer=false
+18:42:43.630 [sim-akka.actor.default-dispatcher-10] INFO  Node-8                                   - Node 8 initialized: 1 neighbors, timerEnabled=false
+18:42:43.630 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 9: 1 neighbors, timer=false
+18:42:43.631 [sim-akka.actor.default-dispatcher-10] INFO  Node-9                                   - Node 9 initialized: 1 neighbors, timerEnabled=false
+18:42:43.631 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 10: 1 neighbors, timer=false
+18:42:43.631 [sim-akka.actor.default-dispatcher-7] INFO  Node-10                                  - Node 10 initialized: 1 neighbors, timerEnabled=false
+18:42:43.631 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 11: 1 neighbors, timer=false
+18:42:43.631 [sim-akka.actor.default-dispatcher-11] INFO  Node-11                                  - Node 11 initialized: 1 neighbors, timerEnabled=false
+18:42:43.631 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 12: 1 neighbors, timer=false
+18:42:43.631 [sim-akka.actor.default-dispatcher-11] INFO  Node-12                                  - Node 12 initialized: 1 neighbors, timerEnabled=false
+18:42:43.631 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 13: 1 neighbors, timer=false
+18:42:43.631 [sim-akka.actor.default-dispatcher-11] INFO  Node-13                                  - Node 13 initialized: 1 neighbors, timerEnabled=false
+18:42:43.631 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 14: 1 neighbors, timer=false
+18:42:43.631 [sim-akka.actor.default-dispatcher-11] INFO  Node-14                                  - Node 14 initialized: 1 neighbors, timerEnabled=false
+18:42:43.631 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 15: 1 neighbors, timer=false
+18:42:43.631 [sim-akka.actor.default-dispatcher-7] INFO  Node-15                                  - Node 15 initialized: 1 neighbors, timerEnabled=false
+18:42:43.631 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 16: 1 neighbors, timer=false
+18:42:43.631 [sim-akka.actor.default-dispatcher-7] INFO  Node-16                                  - Node 16 initialized: 1 neighbors, timerEnabled=false
+18:42:43.631 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 17: 0 neighbors, timer=false
+18:42:43.631 [sim-akka.actor.default-dispatcher-7] INFO  Node-17                                  - Node 17 initialized: 0 neighbors, timerEnabled=false
+18:42:43.631 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 18: 1 neighbors, timer=false
+18:42:43.631 [sim-akka.actor.default-dispatcher-7] INFO  Node-18                                  - Node 18 initialized: 1 neighbors, timerEnabled=false
+18:42:43.631 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 19: 1 neighbors, timer=false
+18:42:43.631 [sim-akka.actor.default-dispatcher-7] INFO  Node-19                                  - Node 19 initialized: 1 neighbors, timerEnabled=false
+18:42:43.632 [sim-akka.actor.default-dispatcher-7] INFO  Node-20                                  - Node 20 initialized: 1 neighbors, timerEnabled=false
+18:42:43.632 [main] INFO  c.u.c.d.s.GraphToActorMapper$            - Initialized node 20: 1 neighbors, timer=false
+18:42:43.632 [main] INFO  c.u.c.d.s.ActorSystemBootstrap$          - 21 actors running
+18:42:43.632 [main] INFO  c.u.c.d.s.ActorSystemBootstrap$          - Running for 5 seconds
+18:42:43.696 [sim-akka.actor.default-dispatcher-11] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:43.723 [sim-akka.actor.default-dispatcher-12] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:43.723 [sim-akka.actor.default-dispatcher-11] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:43.723 [sim-akka.actor.default-dispatcher-12] INFO  Node-14                                  - Node 14 → Node 6: WORK 'work-from-14'
+18:42:43.723 [sim-akka.actor.default-dispatcher-7] INFO  Node-6                                   - Node 6 → Node 7: WORK 'work-from-6'
+18:42:43.723 [sim-akka.actor.default-dispatcher-10] INFO  Node-7                                   - Node 7 → Node 11: WORK 'work-from-7'
+18:42:43.723 [sim-akka.actor.default-dispatcher-12] INFO  Node-11                                  - Node 11 → Node 10: WORK 'work-from-11'
+18:42:43.723 [sim-akka.actor.default-dispatcher-7] INFO  Node-10                                  - Node 10 → Node 5: WORK 'work-from-10'
+18:42:43.743 [sim-akka.actor.default-dispatcher-10] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:43.793 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:43.793 [sim-akka.actor.default-dispatcher-11] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:43.843 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:43.873 [sim-akka.actor.default-dispatcher-11] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:43.893 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:43.943 [sim-akka.actor.default-dispatcher-7] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:43.943 [sim-akka.actor.default-dispatcher-11] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:43.993 [sim-akka.actor.default-dispatcher-7] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:44.023 [sim-akka.actor.default-dispatcher-11] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:44.043 [sim-akka.actor.default-dispatcher-7] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:44.092 [sim-akka.actor.default-dispatcher-7] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:44.092 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:44.093 [sim-akka.actor.default-dispatcher-10] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:44.146 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:44.173 [sim-akka.actor.default-dispatcher-16] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:44.193 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:44.243 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:44.243 [sim-akka.actor.default-dispatcher-15] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:44.293 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:44.323 [sim-akka.actor.default-dispatcher-12] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:44.343 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:44.394 [sim-akka.actor.default-dispatcher-8] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:44.394 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:44.443 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:44.473 [sim-akka.actor.default-dispatcher-8] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:44.493 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:44.543 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:44.543 [sim-akka.actor.default-dispatcher-16] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:44.593 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:44.623 [sim-akka.actor.default-dispatcher-12] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:44.623 [sim-akka.actor.default-dispatcher-15] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:44.643 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:44.693 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:44.693 [sim-akka.actor.default-dispatcher-12] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:44.743 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:44.773 [sim-akka.actor.default-dispatcher-12] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:44.792 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:44.843 [sim-akka.actor.default-dispatcher-16] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:44.843 [sim-akka.actor.default-dispatcher-12] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:44.843 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:44.893 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:44.923 [sim-akka.actor.default-dispatcher-8] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:44.943 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:44.992 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:44.992 [sim-akka.actor.default-dispatcher-12] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:45.044 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:45.073 [sim-akka.actor.default-dispatcher-12] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:45.094 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:45.143 [sim-akka.actor.default-dispatcher-8] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:45.143 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:45.193 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:45.222 [sim-akka.actor.default-dispatcher-15] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:45.243 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:45.292 [sim-akka.actor.default-dispatcher-8] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:45.292 [sim-akka.actor.default-dispatcher-12] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:45.293 [sim-akka.actor.default-dispatcher-6] INFO  Node-6                                   - Node 6 → Node 7: WORK 'work-from-6'
+18:42:45.293 [sim-akka.actor.default-dispatcher-15] INFO  Node-14                                  - Node 14 → Node 6: WORK 'work-from-14'
+18:42:45.293 [sim-akka.actor.default-dispatcher-16] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:45.293 [sim-akka.actor.default-dispatcher-12] INFO  Node-7                                   - Node 7 → Node 11: WORK 'work-from-7'
+18:42:45.343 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:45.371 [sim-akka.actor.default-dispatcher-16] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:45.392 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:45.443 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:45.443 [sim-akka.actor.default-dispatcher-9] INFO  Node-7                                   - Node 7 → Node 11: WORK 'work-from-7'
+18:42:45.443 [sim-akka.actor.default-dispatcher-16] INFO  Node-11                                  - Node 11 → Node 10: WORK 'work-from-11'
+18:42:45.443 [sim-akka.actor.default-dispatcher-12] INFO  Node-14                                  - Node 14 → Node 6: WORK 'work-from-14'
+18:42:45.443 [sim-akka.actor.default-dispatcher-15] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:45.443 [sim-akka.actor.default-dispatcher-8] INFO  Node-6                                   - Node 6 → Node 7: WORK 'work-from-6'
+18:42:45.443 [sim-akka.actor.default-dispatcher-6] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:45.493 [sim-akka.actor.default-dispatcher-8] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:45.523 [sim-akka.actor.default-dispatcher-8] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:45.544 [sim-akka.actor.default-dispatcher-17] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:45.593 [sim-akka.actor.default-dispatcher-14] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:45.593 [sim-akka.actor.default-dispatcher-8] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:45.643 [sim-akka.actor.default-dispatcher-6] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:45.673 [sim-akka.actor.default-dispatcher-6] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:45.693 [sim-akka.actor.default-dispatcher-14] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:45.743 [sim-akka.actor.default-dispatcher-17] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:45.743 [sim-akka.actor.default-dispatcher-8] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:45.792 [sim-akka.actor.default-dispatcher-17] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:45.823 [sim-akka.actor.default-dispatcher-17] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:45.843 [sim-akka.actor.default-dispatcher-6] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:45.893 [sim-akka.actor.default-dispatcher-14] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:45.893 [sim-akka.actor.default-dispatcher-8] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:45.944 [sim-akka.actor.default-dispatcher-14] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:45.972 [sim-akka.actor.default-dispatcher-8] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:45.972 [sim-akka.actor.default-dispatcher-8] INFO  Node-6                                   - Node 6 → Node 7: WORK 'work-from-6'
+18:42:45.972 [sim-akka.actor.default-dispatcher-14] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:45.972 [sim-akka.actor.default-dispatcher-17] INFO  Node-14                                  - Node 14 → Node 6: WORK 'work-from-14'
+18:42:45.972 [sim-akka.actor.default-dispatcher-6] INFO  Node-7                                   - Node 7 → Node 11: WORK 'work-from-7'
+18:42:45.992 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:46.043 [sim-akka.actor.default-dispatcher-17] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:46.043 [sim-akka.actor.default-dispatcher-6] INFO  Node-14                                  - Node 14 → Node 6: WORK 'work-from-14'
+18:42:46.043 [sim-akka.actor.default-dispatcher-15] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:46.043 [sim-akka.actor.default-dispatcher-14] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:46.092 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:46.123 [sim-akka.actor.default-dispatcher-9] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:46.143 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:46.193 [sim-akka.actor.default-dispatcher-7] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:46.193 [sim-akka.actor.default-dispatcher-12] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:46.244 [sim-akka.actor.default-dispatcher-7] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:46.272 [sim-akka.actor.default-dispatcher-12] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:46.294 [sim-akka.actor.default-dispatcher-7] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:46.343 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:46.343 [sim-akka.actor.default-dispatcher-9] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:46.393 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:46.422 [sim-akka.actor.default-dispatcher-9] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:46.443 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:46.493 [sim-akka.actor.default-dispatcher-7] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:46.493 [sim-akka.actor.default-dispatcher-12] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:46.493 [sim-akka.actor.default-dispatcher-13] INFO  Node-6                                   - Node 6 → Node 7: WORK 'work-from-6'
+18:42:46.493 [sim-akka.actor.default-dispatcher-16] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:46.493 [sim-akka.actor.default-dispatcher-9] INFO  Node-14                                  - Node 14 → Node 6: WORK 'work-from-14'
+18:42:46.541 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:46.573 [sim-akka.actor.default-dispatcher-9] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:46.593 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:46.643 [sim-akka.actor.default-dispatcher-9] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:46.643 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:46.692 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:46.723 [sim-akka.actor.default-dispatcher-9] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:46.724 [sim-akka.actor.default-dispatcher-9] INFO  Node-14                                  - Node 14 → Node 6: WORK 'work-from-14'
+18:42:46.724 [sim-akka.actor.default-dispatcher-16] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:46.743 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:46.791 [sim-akka.actor.default-dispatcher-9] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:46.791 [sim-akka.actor.default-dispatcher-13] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:46.842 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:46.871 [sim-akka.actor.default-dispatcher-14] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:46.871 [sim-akka.actor.default-dispatcher-12] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:46.871 [sim-akka.actor.default-dispatcher-13] INFO  Node-14                                  - Node 14 → Node 6: WORK 'work-from-14'
+18:42:46.871 [sim-akka.actor.default-dispatcher-14] INFO  Node-6                                   - Node 6 → Node 7: WORK 'work-from-6'
+18:42:46.871 [sim-akka.actor.default-dispatcher-12] INFO  Node-7                                   - Node 7 → Node 11: WORK 'work-from-7'
+18:42:46.871 [sim-akka.actor.default-dispatcher-7] INFO  Node-11                                  - Node 11 → Node 10: WORK 'work-from-11'
+18:42:46.871 [sim-akka.actor.default-dispatcher-12] INFO  Node-10                                  - Node 10 → Node 5: WORK 'work-from-10'
+18:42:46.871 [sim-akka.actor.default-dispatcher-7] INFO  Node-5                                   - Node 5 → Node 15: WORK 'work-from-5'
+18:42:46.892 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:46.942 [sim-akka.actor.default-dispatcher-7] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:46.942 [sim-akka.actor.default-dispatcher-14] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:46.992 [sim-akka.actor.default-dispatcher-7] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:47.022 [sim-akka.actor.default-dispatcher-12] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:47.022 [sim-akka.actor.default-dispatcher-7] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:47.022 [sim-akka.actor.default-dispatcher-7] INFO  Node-6                                   - Node 6 → Node 7: WORK 'work-from-6'
+18:42:47.022 [sim-akka.actor.default-dispatcher-14] INFO  Node-14                                  - Node 14 → Node 6: WORK 'work-from-14'
+18:42:47.042 [sim-akka.actor.default-dispatcher-14] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:47.092 [sim-akka.actor.default-dispatcher-12] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:47.092 [sim-akka.actor.default-dispatcher-9] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:47.143 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:47.173 [sim-akka.actor.default-dispatcher-9] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:47.173 [sim-akka.actor.default-dispatcher-12] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:47.173 [sim-akka.actor.default-dispatcher-7] INFO  Node-14                                  - Node 14 → Node 6: WORK 'work-from-14'
+18:42:47.173 [sim-akka.actor.default-dispatcher-9] INFO  Node-6                                   - Node 6 → Node 7: WORK 'work-from-6'
+18:42:47.193 [sim-akka.actor.default-dispatcher-7] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:47.243 [sim-akka.actor.default-dispatcher-14] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:47.243 [sim-akka.actor.default-dispatcher-9] INFO  Node-14                                  - Node 14 → Node 6: WORK 'work-from-14'
+18:42:47.243 [sim-akka.actor.default-dispatcher-12] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:47.243 [sim-akka.actor.default-dispatcher-7] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:47.291 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:47.322 [sim-akka.actor.default-dispatcher-11] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:47.341 [sim-akka.actor.default-dispatcher-16] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:47.393 [sim-akka.actor.default-dispatcher-14] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:47.393 [sim-akka.actor.default-dispatcher-9] INFO  Node-6                                   - Node 6 → Node 7: WORK 'work-from-6'
+18:42:47.393 [sim-akka.actor.default-dispatcher-12] INFO  Node-7                                   - Node 7 → Node 11: WORK 'work-from-7'
+18:42:47.393 [sim-akka.actor.default-dispatcher-16] INFO  Node-14                                  - Node 14 → Node 6: WORK 'work-from-14'
+18:42:47.393 [sim-akka.actor.default-dispatcher-11] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:47.393 [sim-akka.actor.default-dispatcher-13] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:47.442 [sim-akka.actor.default-dispatcher-11] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:47.473 [sim-akka.actor.default-dispatcher-16] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:47.493 [sim-akka.actor.default-dispatcher-11] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:47.543 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:47.543 [sim-akka.actor.default-dispatcher-13] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:47.593 [sim-akka.actor.default-dispatcher-10] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:47.623 [sim-akka.actor.default-dispatcher-8] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:47.643 [sim-akka.actor.default-dispatcher-14] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:47.693 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:47.693 [sim-akka.actor.default-dispatcher-10] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:47.741 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:47.773 [sim-akka.actor.default-dispatcher-15] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:47.773 [sim-akka.actor.default-dispatcher-10] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:47.793 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:47.844 [sim-akka.actor.default-dispatcher-8] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:47.844 [sim-akka.actor.default-dispatcher-14] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:47.894 [sim-akka.actor.default-dispatcher-7] INFO  Node-0                                   - Node 0 → Node 2: GOSSIP 'tick-from-0'
+18:42:47.921 [sim-akka.actor.default-dispatcher-13] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:47.943 [sim-akka.actor.default-dispatcher-10] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:47.993 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:47.993 [sim-akka.actor.default-dispatcher-9] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:48.042 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:48.072 [sim-akka.actor.default-dispatcher-9] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:48.093 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:48.142 [sim-akka.actor.default-dispatcher-10] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:48.142 [sim-akka.actor.default-dispatcher-13] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:48.192 [sim-akka.actor.default-dispatcher-10] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:48.222 [sim-akka.actor.default-dispatcher-13] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:48.243 [sim-akka.actor.default-dispatcher-10] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:48.293 [sim-akka.actor.default-dispatcher-10] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:48.293 [sim-akka.actor.default-dispatcher-9] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:48.343 [sim-akka.actor.default-dispatcher-10] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:48.372 [sim-akka.actor.default-dispatcher-12] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:48.393 [sim-akka.actor.default-dispatcher-10] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:48.443 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:48.443 [sim-akka.actor.default-dispatcher-15] INFO  Node-1                                   - Node 1 → Node 12: PING 'tick-from-1'
+18:42:48.493 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:48.523 [sim-akka.actor.default-dispatcher-15] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:48.542 [sim-akka.actor.default-dispatcher-12] INFO  Node-0                                   - Node 0 → Node 1: GOSSIP 'tick-from-0'
+18:42:48.594 [sim-akka.actor.default-dispatcher-15] INFO  Node-0                                   - Node 0 → Node 2: PING 'tick-from-0'
+18:42:48.594 [sim-akka.actor.default-dispatcher-12] INFO  Node-12                                  - Node 12 → Node 14: WORK 'work-from-12'
+18:42:48.594 [sim-akka.actor.default-dispatcher-8] INFO  Node-14                                  - Node 14 → Node 6: WORK 'work-from-14'
+18:42:48.594 [sim-akka.actor.default-dispatcher-16] INFO  Node-1                                   - Node 1 → Node 12: WORK 'tick-from-1'
+18:42:48.634 [main] INFO  c.u.c.d.s.ActorSystemBootstrap$          - === Simulation Complete ===
+18:42:48.634 [main] INFO  c.u.c.d.simruntimeakka.MetricsCollector  - ==========================================
+18:42:48.634 [main] INFO  c.u.c.d.simruntimeakka.MetricsCollector  - === SIMULATION METRICS FINAL REPORT  ===
+18:42:48.634 [main] INFO  c.u.c.d.simruntimeakka.MetricsCollector  - ==========================================
+18:42:48.636 [main] INFO  c.u.c.d.simruntimeakka.MetricsCollector  - Total messages sent:    513
+18:42:48.636 [main] INFO  c.u.c.d.simruntimeakka.MetricsCollector  - Total messages dropped: 0
+18:42:48.638 [main] INFO  c.u.c.d.simruntimeakka.MetricsCollector  -   PING → sent: 99, dropped: 0
+18:42:48.638 [main] INFO  c.u.c.d.simruntimeakka.MetricsCollector  -   GOSSIP → sent: 330, dropped: 0
+18:42:48.638 [main] INFO  c.u.c.d.simruntimeakka.MetricsCollector  -   WORK → sent: 84, dropped: 0
+18:42:48.638 [main] INFO  c.u.c.d.simruntimeakka.MetricsCollector  - ==========================================
+18:42:48.642 [sim-akka.actor.default-dispatcher-8] INFO  Node-0                                   - Node 0 → Node 1: PING 'tick-from-0'
+18:42:48.647 [sim-akka.actor.default-dispatcher-8] INFO  akka.actor.CoordinatedShutdown           - Running CoordinatedShutdown with reason [ActorSystemTerminateReason]
+18:42:48.663 [main] INFO  c.u.c.d.s.ActorSystemBootstrap$          - === Shutdown Complete ===
+18:42:48.663 [main] INFO  c.uic.cs553.distributed.simcli.SimMain$  - === SimMain complete ===

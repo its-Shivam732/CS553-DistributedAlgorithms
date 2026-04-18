@@ -1,0 +1,668 @@
+{
+  "nodes" : [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+  ],
+  "edges" : [
+    {
+      "from" : 13,
+      "to" : 9
+    },
+    {
+      "from" : 12,
+      "to" : 14
+    },
+    {
+      "from" : 11,
+      "to" : 10
+    },
+    {
+      "from" : 10,
+      "to" : 5
+    },
+    {
+      "from" : 0,
+      "to" : 1
+    },
+    {
+      "from" : 7,
+      "to" : 11
+    },
+    {
+      "from" : 15,
+      "to" : 3
+    },
+    {
+      "from" : 20,
+      "to" : 16
+    },
+    {
+      "from" : 16,
+      "to" : 19
+    },
+    {
+      "from" : 6,
+      "to" : 7
+    },
+    {
+      "from" : 18,
+      "to" : 8
+    },
+    {
+      "from" : 1,
+      "to" : 12
+    },
+    {
+      "from" : 9,
+      "to" : 18
+    },
+    {
+      "from" : 2,
+      "to" : 13
+    },
+    {
+      "from" : 14,
+      "to" : 6
+    },
+    {
+      "from" : 8,
+      "to" : 4
+    },
+    {
+      "from" : 0,
+      "to" : 2
+    },
+    {
+      "from" : 4,
+      "to" : 20
+    },
+    {
+      "from" : 5,
+      "to" : 15
+    },
+    {
+      "from" : 19,
+      "to" : 17
+    }
+  ],
+  "edgeLabels" : [
+    {
+      "from" : 10,
+      "to" : 5,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 13,
+      "to" : 9,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 8,
+      "to" : 4,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 16,
+      "to" : 19,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 7,
+      "to" : 11,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 0,
+      "to" : 1,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 5,
+      "to" : 15,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 1,
+      "to" : 12,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 20,
+      "to" : 16,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 18,
+      "to" : 8,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 15,
+      "to" : 3,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 12,
+      "to" : 14,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 11,
+      "to" : 10,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 19,
+      "to" : 17,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 6,
+      "to" : 7,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 4,
+      "to" : 20,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 2,
+      "to" : 13,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 14,
+      "to" : 6,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 9,
+      "to" : 18,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    },
+    {
+      "from" : 0,
+      "to" : 2,
+      "allowed" : [
+        "CONTROL",
+        "PING",
+        "GOSSIP",
+        "WORK"
+      ]
+    }
+  ],
+  "nodePdfs" : [
+    {
+      "nodeId" : 0,
+      "entries" : [
+        {
+          "msg" : "WORK",
+          "p" : 0.7
+        },
+        {
+          "msg" : "PING",
+          "p" : 0.2
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.1
+        }
+      ]
+    },
+    {
+      "nodeId" : 5,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 10,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 14,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 20,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 1,
+      "entries" : [
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.6
+        },
+        {
+          "msg" : "PING",
+          "p" : 0.3
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.1
+        }
+      ]
+    },
+    {
+      "nodeId" : 6,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 9,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 13,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 2,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 17,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 12,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 7,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 3,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 18,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 16,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 11,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 8,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 19,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 4,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    },
+    {
+      "nodeId" : 15,
+      "entries" : [
+        {
+          "msg" : "PING",
+          "p" : 0.4
+        },
+        {
+          "msg" : "GOSSIP",
+          "p" : 0.35
+        },
+        {
+          "msg" : "WORK",
+          "p" : 0.25
+        }
+      ]
+    }
+  ]
+}
