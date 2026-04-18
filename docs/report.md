@@ -567,47 +567,9 @@ Total messages sent:    1610    dropped: 725
 
 ---
 
-## 6. Reproducible Experiment Script
 
-```bash
-# 1. Clone
-git clone --recurse-submodules https://github.com/its-Shivam732/CS553-DistributedAlgorithms.git
-cd CS553-DistributedAlgorithms
 
-# 2. Set Java 17 (required — Java 21 breaks Akka Classic reflection)
-export JAVA_HOME=$(/usr/libexec/java_home -v 17)
-export PATH=$JAVA_HOME/bin:$PATH
-java -version   # Must show 17.x.x
-
-# 3. Compile and test
-sbt compile
-sbt test
-
-# 4. Experiment 1 — Baseline
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain --graph src/main/resources/graphs/SmallGraph.ngs --run 5s --no-algorithms --save-graph outputs/smallgraph-enriched.json" 2>&1 | tee outputs/no-algo-small.log
-
-# 5. Experiment 2 — Wave, SmallGraph
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain --graph src/main/resources/graphs/SmallGraph.ngs --run 30s --wave-only --save-graph outputs/smallgraph-enriched.json" 2>&1 | tee outputs/exp1-wave-small.log
-
-# 6. Experiment 3 — Lai-Yang, MediumGraph
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain --graph src/main/resources/graphs/MediumGraph.ngs --run 60s --snapshot-only --save-graph outputs/mediumgraph-enriched.json" 2>&1 | tee outputs/exp2-snapshot-medium.log
-
-# 7. Experiment 4 — Both, LargeGraph
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain --graph src/main/resources/graphs/LargeGraph.ngs --run 120s --save-graph outputs/largegraph-enriched.json" 2>&1 | tee outputs/exp3-both-large.log
-
-# 8. Experiment 5 — Injection
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain --graph src/main/resources/graphs/LargeGraph.ngs --run 30s --inject src/main/resources/inject.txt" 2>&1 | tee outputs/exp4-injection.log
-
-# 9. Experiment 6 — Strict config
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain --config src/main/resources/application-exp2.conf --run 30s" 2>&1 | tee outputs/exp5-small-pingheavy.log
-```
-
-**Linux:** Replace `$(/usr/libexec/java_home -v 17)` with `/usr/lib/jvm/java-17-openjdk-amd64`.  
-**zsh:** All `sbt` commands must be on a single line — backslash continuation inside `sbt "..."` fails in zsh.
-
----
-
-## 7. Algorithm Correctness Arguments
+## 6. Algorithm Correctness Arguments
 
 ### Wave Algorithm
 
@@ -633,7 +595,7 @@ The Echo Algorithm satisfies the three wave algorithm properties:
 
 ---
 
-## 8. Known Limitations
+## 7. Known Limitations
 
 1. **Global snapshot termination detection.** Per-node completion is detected. A global coordinator collecting all local snapshots and announcing global completion is not implemented — would require an additional message round.
 
