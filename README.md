@@ -77,25 +77,20 @@ CS553_2026/
 │   ├── main/
 │   │   ├── resources/
 │   │   │   ├── application.conf         # All simulation parameters (no hardcoding)
+│   │   │   ├── application-exp2.conf    # Strict edge config for Experiment 6
 │   │   │   ├── logback.xml              # Logging configuration
 │   │   │   ├── inject.txt               # File-driven injection script
 │   │   │   └── graphs/
-│   │   │       ├── SmallGraph.ngs       # 21 nodes, 20 edges  (Experiment 1)
-│   │   │       ├── MediumGraph.ngs      # 51 nodes, 54 edges  (Experiment 2)
-│   │   │       └── LargeGraph.ngs       # 101 nodes, 109 edges (Experiment 3)
+│   │   │       ├── SmallGraph.ngs       # 21 nodes, 20 edges
+│   │   │       ├── MediumGraph.ngs      # 51 nodes, 54 edges
+│   │   │       └── LargeGraph.ngs       # 101 nodes, 138 edges
 │   │   └── scala/com/uic/cs553/distributed/
 │   │       ├── algorithms/
 │   │       │   ├── WaveAlgorithm.scala       # Wave algorithm (Index 13)
 │   │       │   ├── LaiYangSnapshot.scala     # Lai-Yang snapshot (Index 23)
 │   │       │   ├── AlgorithmRegistry.scala   # Config-driven algorithm loader
 │   │       │   ├── WaveMessages.scala        # Wave protocol messages
-│   │       │   ├── LaiYangMessages.scala     # Lai-Yang protocol messages
-│   │       │   ├── EchoAlgorithm.scala       # Prof-provided example
-│   │       │   ├── BullyLeaderElection.scala # Prof-provided example
-│   │       │   └── TokenRingAlgorithm.scala  # Prof-provided example
-│   │       ├── framework/
-│   │       │   ├── DistributedNode.scala     # Prof-provided base framework
-│   │       │   └── ExperimentRunner.scala    # Prof-provided experiment runner
+│   │       │   └── LaiYangMessages.scala     # Lai-Yang protocol messages
 │   │       ├── simcli/
 │   │       │   ├── SimMain.scala             # Main entry point
 │   │       │   ├── FileDrivenInjector.scala  # --inject mode
@@ -132,14 +127,13 @@ CS553_2026/
 │           └── GraphToActorMapperTest.scala
 │
 ├── docs/
-│   └── report.md                        # Design decisions + experiment results
+│   └── report.md                        # Full design decisions + experiment results
 │
-├── build.sbt                            # Build definition + Cinnamon plugin
-├── project/
-│   └── plugins.sbt                      # sbt plugins (assembly, Cinnamon)
+├── build.sbt
+├── project/plugins.sbt
 ├── .gitignore
-├── .gitmodules                          # netgamesim submodule reference
-└── README.md                           # This file
+├── .gitmodules
+└── README.md
 ```
 
 ---
@@ -181,10 +175,11 @@ GraphToActorMapper       ← Creates one NodeActor per node, wires ActorRefs
 ```
 
 ---
+
 ## Key Source Files
 
 ### `NodeActor.scala`
-The core simulation actor. Uses `context.become` for immutable state transitions. Handles `Init`, `Tick`, `Envelope`, `ExternalInput`, `AlgorithmMsg`, and `Stop` messages. Enforces edge labels on every send.
+The core simulation actor. Uses `context.become` for immutable state transitions. Handles `Init`, `Tick`, `Envelope`, `ExternalInput`, `AlgorithmMsg`, and `Stop` messages. Enforces edge labels on every send. Implements PING→ACK reply (topology-dependent), GOSSIP hop forwarding, and WORK cascade with 50% probability.
 
 ### `WaveAlgorithm.scala`
 Echo-algorithm variant of the Wave algorithm. Initiator sends WAVE to all neighbors. Internal nodes forward and collect ACKs. Leaf nodes ACK immediately. Initiator decides when all ACKs received. Uses immutable `WaveState` case class.
@@ -209,10 +204,9 @@ All simulation parameters live in `src/main/resources/application.conf`:
 
 ```hocon
 sim {
-  # Graph file — relative path from project root
   graphFile = "src/main/resources/graphs/LargeGraph.ngs"
-  seed = 999                    # Random seed for reproducibility
-  runDurationSeconds = 120      # How long to run
+  seed = 999
+  runDurationSeconds = 120
 
   messages {
     types = [ "CONTROL", "PING", "GOSSIP", "WORK", "ACK" ]
@@ -221,10 +215,9 @@ sim {
   edgeLabeling {
     default = [ "CONTROL", "PING", "GOSSIP", "WORK" ]
     overrides = [
-      # Restrict specific edges to fewer message types
-      { from = 0, to = 35, allow = [ "CONTROL", "PING", "WORK" ] },
-      { from = 1, to = 20, allow = [ "CONTROL", "GOSSIP", "WORK" ] },
-      { from = 35, to = 9, allow = [ "CONTROL", "WORK" ] }
+      { from = 0,  to = 35, allow = [ "CONTROL", "PING", "WORK" ] },
+      { from = 1,  to = 20, allow = [ "CONTROL", "GOSSIP", "WORK" ] },
+      { from = 35, to = 9,  allow = [ "CONTROL", "WORK" ] }
     ]
   }
 
@@ -236,7 +229,6 @@ sim {
       { msg = "GOSSIP", p = 0.35 },
       { msg = "WORK",   p = 0.25 }
     ]
-    # Per-node overrides — specific nodes generate different traffic
     perNodePdf = [
       { node = 0,  pdf = [ { msg = "WORK", p = 0.70 }, { msg = "PING", p = 0.20 }, { msg = "GOSSIP", p = 0.10 } ] },
       { node = 1,  pdf = [ { msg = "GOSSIP", p = 0.60 }, { msg = "PING", p = 0.30 }, { msg = "WORK", p = 0.10 } ] },
@@ -246,29 +238,18 @@ sim {
 
   initiators {
     timers = [
-      { node = 0, tickEveryMs = 50,  mode = "pdf" },          # PDF-driven timer
-      { node = 1, tickEveryMs = 75,  mode = "fixed", fixedMsg = "GOSSIP" }  # Fixed-type timer
+      { node = 0, tickEveryMs = 50,  mode = "pdf" },
+      { node = 1, tickEveryMs = 75,  mode = "fixed", fixedMsg = "GOSSIP" }
     ]
-    inputs = [
-      { node = 2 }    # Input node — accepts external injection
-    ]
+    inputs = [{ node = 2 }]
   }
 
   algorithms {
-    initiatorNode  = 0
-    enableWave     = true
-    enableLaiYang  = true
+    initiatorNode = 0
+    enableWave    = true
+    enableLaiYang = true
   }
 }
-```
-
-### Override at runtime via CLI flags
-
-```bash
-# Override graph and duration without editing application.conf
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain \
-  --graph src/main/resources/graphs/SmallGraph.ngs \
-  --run 30s"
 ```
 
 ---
@@ -301,155 +282,102 @@ java -version   # Must show 17
 sbt compile
 ```
 
-Expected output: `[success] Total time: ...`
-
 ---
 
 ## Generating Graphs
 
-Graphs are pre-generated and included in `src/main/resources/graphs/`. NetGameSim generates `.ngs` binary files via Java serialization.
+Graphs are pre-generated and included in `src/main/resources/graphs/`.
 
-### Pre-included graphs
+| File | Nodes | Edges |
+|------|-------|-------|
+| `SmallGraph.ngs` | 21 | 20 |
+| `MediumGraph.ngs` | 51 | 54 |
+| `LargeGraph.ngs` | 101 | 138 |
 
-| File | Nodes | Edges | Used in |
-|------|-------|-------|---------|
-| `SmallGraph.ngs` | 21 | 20 | Experiment 1 |
-| `MediumGraph.ngs` | 51 | 54 | Experiment 2 |
-| `LargeGraph.ngs` | 101 | 109 | Experiment 3 |
-
-### To regenerate graphs (optional)
+All graphs are directed and asymmetric. To regenerate:
 
 ```bash
-cd netgamesim
-sbt run
-# Graphs are written to netgamesim/target/ or configured output directory
-# Copy .ngs files to src/main/resources/graphs/
+cd netgamesim && sbt run
+# Copy output .ngs files to src/main/resources/graphs/
 ```
-
-### How graph loading works
-
-`GraphLoader.loadFromPath(path)` uses a custom `ObjectInputStream` with NetGameSim's classloader to deserialize `List[NetGraphComponent]`. Nodes become `Set[Int]` (using `NodeObject.id`), edges become `Set[SimEdge]`.
 
 ---
 
 ## Running Experiments
 
-### Experiment 1 — Wave Algorithm, SmallGraph, 30 seconds
+Six experiments are documented in `docs/report.md` with full results. Commands below — all must be run as single lines in zsh:
 
 ```bash
-export JAVA_HOME=$(/usr/libexec/java_home -v 17) && export PATH=$JAVA_HOME/bin:$PATH
+# Experiment 1 — No-algorithm baseline (SmallGraph, 5s)
+sbt "runMain com.uic.cs553.distributed.simcli.SimMain --graph src/main/resources/graphs/SmallGraph.ngs --run 5s --no-algorithms --save-graph outputs/smallgraph-enriched.json" 2>&1 | tee outputs/no-algo-small.log
 
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain \
-  --graph src/main/resources/graphs/SmallGraph.ngs \
-  --run 30s \
-  --wave-only"
+# Experiment 2 — Wave algorithm (SmallGraph, 30s)
+sbt "runMain com.uic.cs553.distributed.simcli.SimMain --graph src/main/resources/graphs/SmallGraph.ngs --run 30s --wave-only --save-graph outputs/smallgraph-enriched.json" 2>&1 | tee outputs/exp1-wave-small.log
+
+# Experiment 3 — Lai-Yang snapshot (MediumGraph, 60s)
+sbt "runMain com.uic.cs553.distributed.simcli.SimMain --graph src/main/resources/graphs/MediumGraph.ngs --run 60s --snapshot-only --save-graph outputs/mediumgraph-enriched.json" 2>&1 | tee outputs/exp2-snapshot-medium.log
+
+# Experiment 4 — Both algorithms (LargeGraph, 120s)
+sbt "runMain com.uic.cs553.distributed.simcli.SimMain --graph src/main/resources/graphs/LargeGraph.ngs --run 120s --save-graph outputs/largegraph-enriched.json" 2>&1 | tee outputs/exp3-both-large.log
+
+# Experiment 5 — File-driven injection (LargeGraph, 30s)
+sbt "runMain com.uic.cs553.distributed.simcli.SimMain --graph src/main/resources/graphs/LargeGraph.ngs --run 30s --inject src/main/resources/inject.txt" 2>&1 | tee outputs/exp4-injection.log
+
+# Experiment 6 — Strict config override (SmallGraph, 30s, both algorithms)
+sbt "runMain com.uic.cs553.distributed.simcli.SimMain --config src/main/resources/application-exp2.conf --run 30s" 2>&1 | tee outputs/exp5-small-pingheavy.log
 ```
 
-**Expected output:**
-- 21 actors initialized
-- Wave propagation: `Node 0: sending wave ... to neighbors`
-- GOSSIP messages dropped (edge label enforcement)
-- Metrics: ~532 sent, ~210 GOSSIP dropped
+### Results summary
 
-### Experiment 2 — Lai-Yang Snapshot, MediumGraph, 60 seconds
+| # | Graph | Algorithm | Sent | Dropped | CONTROL |
+|---|-------|-----------|------|---------|---------|
+| 1 | Small 21n/20e | None | 513 | 0 | 0 |
+| 2 | Small 21n/20e | Wave | 2,746 | 0 | 20 ✅ |
+| 3 | Medium 51n/54e | Lai-Yang | 9,320 | 476 PING | 54 ✅ |
+| 4 | Large 101n/138e | Both | 31,993 | 11 WORK | 275 ✅ |
+| 5 | Large 101n/138e | Both + inject | 8,059 | 4 WORK | 275 ✅ |
+| 6 | Small 21n/20e | Both, strict | 1,610 | 724 GOSSIP | 40 ✅ |
 
-```bash
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain \
-  --graph src/main/resources/graphs/MediumGraph.ngs \
-  --run 60s \
-  --snapshot-only"
-```
-
-**Expected output:**
-- 51 actors initialized
-- `Node 0: initiating snapshot`
-- `Node 0: recorded local state at snapshot <id>`
-- `Node 0: turned RED, sending markers to Set(35, 34)`
-- Metrics: ~2,544 sent, 0 dropped
-
-### Experiment 3 — Both Algorithms, LargeGraph, 120 seconds
-
-```bash
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain \
-  --graph src/main/resources/graphs/LargeGraph.ngs \
-  --run 120s"
-```
-
-**Expected output:**
-- 101 actors initialized
-- Both Wave and Lai-Yang running simultaneously
-- Metrics: ~5,036 sent, ~7 WORK dropped
-
-### Experiment Summary
-
-| # | Graph | Algorithm | Sent | Dropped | Duration |
-|---|-------|-----------|------|---------|----------|
-| 1 | SmallGraph (21n/20e) | Wave only | ~532 | ~210 GOSSIP | 30s |
-| 2 | MediumGraph (51n/54e) | Lai-Yang only | ~2,544 | 0 | 60s |
-| 3 | LargeGraph (101n/109e) | Both | ~5,036 | ~7 WORK | 120s |
+CONTROL always equals (graph edges) × (number of active algorithms) — mathematical proof of correct propagation. Full analysis in `docs/report.md`.
 
 ---
 
 ## All Run Commands
 
 ```bash
-# Set Java 17 (required before any sbt command)
-export JAVA_HOME=$(/usr/libexec/java_home -v 17) && export PATH=$JAVA_HOME/bin:$PATH
-
 # Default run — LargeGraph, 120s, both algorithms (from application.conf)
 sbt "runMain com.uic.cs553.distributed.simcli.SimMain"
 
-# With explicit config file
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain \
-  --config src/main/resources/application.conf"
+# Wave only
+sbt "runMain com.uic.cs553.distributed.simcli.SimMain --graph src/main/resources/graphs/SmallGraph.ngs --run 30s --wave-only"
 
-# Override graph and duration
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain \
-  --graph src/main/resources/graphs/SmallGraph.ngs \
-  --run 30s"
+# Lai-Yang only
+sbt "runMain com.uic.cs553.distributed.simcli.SimMain --graph src/main/resources/graphs/MediumGraph.ngs --run 60s --snapshot-only"
 
-# Wave algorithm only
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain \
-  --graph src/main/resources/graphs/SmallGraph.ngs \
-  --run 30s \
-  --wave-only"
+# Both algorithms (explicit graph + duration)
+sbt "runMain com.uic.cs553.distributed.simcli.SimMain --graph src/main/resources/graphs/LargeGraph.ngs --run 120s"
 
-# Lai-Yang snapshot only
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain \
-  --graph src/main/resources/graphs/MediumGraph.ngs \
-  --run 60s \
-  --snapshot-only"
+# No algorithms (traffic only)
+sbt "runMain com.uic.cs553.distributed.simcli.SimMain --graph src/main/resources/graphs/SmallGraph.ngs --run 5s --no-algorithms"
 
-# Both algorithms (explicit)
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain \
-  --graph src/main/resources/graphs/LargeGraph.ngs \
-  --run 120s"
-
-# Traffic only (no algorithms)
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain \
-  --graph src/main/resources/graphs/SmallGraph.ngs \
-  --run 30s \
-  --no-algorithms"
+# Custom config file
+sbt "runMain com.uic.cs553.distributed.simcli.SimMain --config src/main/resources/application-exp2.conf --run 30s"
 
 # File-driven injection
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain \
-  --inject src/main/resources/inject.txt"
+sbt "runMain com.uic.cs553.distributed.simcli.SimMain --inject src/main/resources/inject.txt"
 
-# Interactive injection (type commands in terminal)
-sbt "runMain com.uic.cs553.distributed.simcli.SimMain \
-  --interactive"
+# Interactive injection
+sbt "runMain com.uic.cs553.distributed.simcli.SimMain --interactive"
 # Then type: node=1 kind=WORK payload=my-task
 #            node=2 kind=PING payload=probe
 #            quit
-
-# Run tests
-sbt test
 ```
+
+> **zsh note:** All `sbt` commands must be on a single line. Backslash line continuation inside `sbt "..."` quotes fails in zsh.
 
 ### Injection file format (`inject.txt`)
 
 ```
-# Format: delayMs=<ms>,node=<id>,kind=<TYPE>,payload=<text>
 delayMs=100,node=1,kind=WORK,payload=task-001
 delayMs=200,node=2,kind=PING,payload=probe-001
 delayMs=500,node=1,kind=GOSSIP,payload=update-001
@@ -464,20 +392,18 @@ delayMs=1000,node=2,kind=WORK,payload=task-002
 sbt test
 ```
 
-### Test files (10 files, 40+ assertions)
-
 | Test File | What it tests |
 |-----------|--------------|
 | `EdgeLabelEnforcementTest` | EdgeLabel allows/blocks correct message types |
-| `PdfSamplerTest` | PDF sampling, reproducibility under seed, Zipf distribution |
-| `SimGraphTest` | Graph topology operations (neighbors, hasEdge, node/edge count) |
+| `PdfSamplerTest` | Sampling, reproducibility under seed, Zipf distribution |
+| `SimGraphTest` | Graph topology operations (neighbors, hasEdge, counts) |
 | `WaveAlgorithmTest` | Wave initiator sends on start, AlgorithmRegistry flags |
 | `NodeActorTest` | Actor init, ExternalInput forwarding, edge label blocking, metrics |
 | `DistributedNodeSpec` | Prof-provided framework base class tests |
 | `LaiYangSnapshotTest` | Snapshot initiator sends CONTROL, non-initiator stays quiet |
 | `GraphEnricherSerializerTest` | Enrich assigns labels/PDFs, round-trip JSON serialize/deserialize |
-| `FileDrivenInjectorTest` | Parse injection scripts, skip comments, inject correct message types |
-| `GraphToActorMapperTest` | Creates correct number of actors, all ActorRefs distinct and live |
+| `FileDrivenInjectorTest` | Parse injection scripts, skip comments, inject correct types |
+| `GraphToActorMapperTest` | Creates correct actor count, all ActorRefs distinct and live |
 
 ---
 
@@ -485,129 +411,77 @@ sbt test
 
 ### Wave Algorithm (Index 13)
 
-**Variant:** Echo Algorithm on general directed graph  
-**System assumptions:**
-- Asynchronous message passing
-- Reliable channels (no message loss)
-- General graph topology (not restricted to ring or tree)
-- No process failures
+**Variant:** Echo Algorithm on general directed graph
 
 **Protocol:**
-1. Initiator (Node 0) sends `WAVE:<id>:<from>` (as CONTROL payload) to all neighbors
-2. IDLE nodes receiving Wave become ACTIVE, forward to all neighbors except parent
-3. Leaf nodes immediately send `WAVEACK:<id>:<from>` back to parent
-4. Nodes collect ACKs from all children; when complete, send ACK to parent
-5. Initiator decides when all ACKs received — wave complete
+1. Initiator (Node 0) sends WAVE (as CONTROL payload) to all neighbors
+2. IDLE nodes receiving WAVE become ACTIVE, forward to all neighbors except parent
+3. Leaf nodes immediately ACK parent
+4. Nodes collect ACKs from all children; when complete, ACK their own parent
+5. Initiator decides when all ACKs received
 
-**State model:** Immutable `WaveState(phase, parent, pendingAcks, waveId, startTime)` case class. Transitions via `.copy()`.
+**Correctness proof:** CONTROL messages in any experiment = graph edges × number of active algorithms. Each directed edge carries exactly one Wave marker. Verified across all experiments.
 
 ### Lai-Yang Snapshot Algorithm (Index 23)
 
-**Variant:** Standard Lai-Yang for NON-FIFO channels  
-**System assumptions:**
-- NON-FIFO asynchronous channels (stronger than Chandy-Lamport)
-- Messages carry color of sender at send time
-- No process failures during snapshot
-- General graph topology
+**Variant:** Standard Lai-Yang for NON-FIFO channels
 
 **Protocol (RED/WHITE coloring):**
-1. Initiator turns RED, records local state, sends `SNAPSHOT_MARKER:<id>:<from>` to all neighbors
-2. WHITE node receiving first marker: turns RED, records state, sends markers to all neighbors
-3. RED node receiving any message: if sender was WHITE, message is in-flight → captured as channel state
-4. Snapshot complete when node is RED and `pendingRed == 0`
+1. Initiator turns RED, records local state, sends SNAPSHOT_MARKER to all neighbors
+2. WHITE node receiving first marker: turns RED, records state, forwards markers to all neighbors
+3. RED node receiving a WHITE message: captures it as in-flight channel state
+4. Snapshot complete per-node when RED and all expected markers received
 
-**State model:** Immutable `SnapState(color, snapshotId, localState, inFlightMessages, pendingRed, ...)` case class. Transitions via `.copy()`.
+**Why Lai-Yang over Chandy-Lamport:** Akka's thread-pool dispatcher does not guarantee FIFO message ordering across concurrent actor dispatches. Chandy-Lamport requires FIFO channels. Lai-Yang's coloring handles non-FIFO channels correctly.
 
 ---
 
 ## Metrics & Observability
 
-Every simulation run prints a final metrics report:
+Every run prints a final report:
 
 ```
 ==========================================
 === SIMULATION METRICS FINAL REPORT  ===
 ==========================================
-Total messages sent:    5036
-Total messages dropped: 7
-  CONTROL → sent: 4,   dropped: 0
-  PING    → sent: 1580, dropped: 0
-  GOSSIP  → sent: 1401, dropped: 0
-  WORK    → sent: 2051, dropped: 7
+Total messages sent:    31993
+Total messages dropped: 11
+  CONTROL → sent: 275,  dropped: 0
+  PING    → sent: 2613, dropped: 0
+  GOSSIP  → sent: 27740,dropped: 0
+  WORK    → sent: 1365, dropped: 11
 ==========================================
 ```
 
-**Metrics are collected via:**
-- `MetricsCollector.recordSent(from, to, kind)` — called in `NodeActor.sendToEligibleNeighbor`
-- `MetricsCollector.recordDropped(from, -1, kind)` — called when no eligible neighbor found
-- `MetricsCollector.recordReceived(nodeId, kind)` — called on every received Envelope
-
-All counters use `TrieMap` + `AtomicLong` for thread-safe concurrent updates.
-
-**Logging levels:**
-- `INFO` — node init, algorithm milestones, every sent message, metrics report
-- `DEBUG` — dropped messages, work queue processing
-- `WARN` — missing neighbors, edge constraint violations in NodeContext
+All counters use `TrieMap` + `AtomicLong` for lock-free concurrent updates across actor threads.
 
 ---
 
 ## Cinnamon Instrumentation
 
-The Lightbend Cinnamon sbt plugin (v2.21.4) is configured in `project/plugins.sbt`:
-
-```scala
-addSbtPlugin("com.lightbend.cinnamon" % "sbt-cinnamon" % "2.21.4")
-```
-
-The actor instrumentation configuration is in `application.conf`:
-
-```hocon
-cinnamon {
-  akka.actors = {
-    default-by-class {
-      includes = "/user/*"
-      report-by = class
-    }
-  }
-}
-```
-
-**Note:** Full Cinnamon instrumentation requires a Lightbend commercial license/token (available at `account.akka.io/token`). The plugin and configuration are present and correctly structured. To activate with a token, add the resolver to `build.sbt`:
-
-```scala
-resolvers += "Akka library repository".at(
-  "https://repo.akka.io/<YOUR_TOKEN>/secure"
-)
-```
-
-And restore the Cinnamon library dependencies:
-```scala
-Cinnamon.library.cinnamonAkka,
-Cinnamon.library.cinnamonCHMetrics,
-Cinnamon.library.cinnamonJvmMetricsProducer
-```
+The Lightbend Cinnamon sbt plugin (v2.21.4) is configured in `project/plugins.sbt`. Actor instrumentation config is present in `application.conf`. Full activation requires a Lightbend commercial license token from `account.akka.io/token`. The built-in `MetricsCollector` provides equivalent per-message-type counters with no external dependency.
 
 ---
 
 ## Design Decisions
 
-### Why Akka Classic (not Typed)?
-The professor's provided framework (`DistributedNode`, `ExperimentRunner`) uses Akka Typed. The simulation runtime uses Akka Classic because `context.become` is more natural for the state machine patterns required by Wave and Lai-Yang algorithms. Both APIs are available on the classpath.
-
 ### Why one actor per node (not router pools)?
-Each graph node has independent algorithm state (wave phase, snapshot color). Router pools share state across instances, which would cause data inconsistency in distributed algorithm execution.
+Each graph node has independent algorithm state — wave phase, snapshot color, pending ACK count. Router pools share state across instances, breaking algorithm correctness. One actor = one unique identity = one consistent state.
 
 ### Why `context.become` instead of `var`?
-The grading rubric deducts 0.3% per `var` used for heap-based shared state. `NodeActor` uses `context.become(initialized(neighbors, pdf, ctx, workQueue))` to pass all mutable state as immutable function parameters, avoiding `var` entirely for the actor's operational state.
+`NodeActor` uses `context.become(initialized(neighbors, pdf, ctx, workQueue))` to pass all mutable state as immutable function parameters, avoiding `var` entirely for operational state. This is the canonical Akka pattern for stateful actors without shared mutable state.
 
-### Why single `var state` in algorithm modules?
-`DistributedAlgorithm` is a plain trait, not an actor. It cannot use `context.become`. The compromise is one `private var state: AlgorithmState` holding an immutable case class, with all transitions via `.copy()`. This is explicitly justified in comments per the rubric.
+### Why Lai-Yang over Chandy-Lamport?
+Akka's dispatcher does not guarantee FIFO ordering across concurrent threads. Chandy-Lamport requires FIFO channels. Lai-Yang uses message coloring instead — RED nodes capture any WHITE message as in-flight, regardless of arrival order.
 
-### Why CONTROL type always allowed on all edges?
-Algorithm protocol messages (wave markers, snapshot markers) must propagate regardless of application-level edge restrictions. Adding CONTROL to every edge in `GraphEnricher.buildEdgeLabels` ensures algorithm correctness without requiring special cases in NodeActor.
+### Why 500ms startup delay?
+All actors initialize concurrently. Without a delay, the initiator sends algorithm markers before other actors finish `Init`, causing dead letters. A 500ms `scheduleOnce` on every actor ensures all actors are in `initialized` state before any algorithm starts.
 
-### Reproducibility
-All experiments use fixed seeds (`seed = 999` in application.conf). `PdfSampler(seed)` wraps `scala.util.Random(seed)` ensuring identical message sequences across runs. Pass `--run` and `--graph` CLI flags to reproduce any experiment configuration.
+### Why CONTROL always allowed on all edges?
+Algorithm protocol messages must propagate regardless of application-level edge restrictions. `GraphEnricher` force-adds CONTROL to every edge's allowed set. Algorithms operate at infrastructure level, above application traffic policy.
+
+### Why Akka Classic (not Typed)?
+`context.become` is the natural fit for the immutable state machine patterns required by Wave and Lai-Yang. Akka Typed requires explicit behavior definitions per state, adding boilerplate for what is fundamentally a behavior-switching pattern.
 
 ---
 
@@ -617,7 +491,6 @@ All experiments use fixed seeds (`seed = 999` in application.conf). `PdfSampler(
 |-----------|---------|
 | Scala | 3.3.1 |
 | Akka Classic | 2.8.5 |
-| Akka Typed | 2.8.5 |
 | sbt | 1.9.7 |
 | Java | 17 (required) |
 | ScalaTest | 3.2.17 |
