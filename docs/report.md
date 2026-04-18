@@ -1,7 +1,12 @@
 # CS553 Project Report — Distributed Algorithms Simulator
 
-**Student:** Shivam Moudgil 
+**Student:** Shivam Moudgil | **UIN:** 665599956  
+**Course:** CS553 — Distributed Computing Systems, Spring 2026  
+**Algorithms:** Wave Algorithm (Index 13) · Lai-Yang Snapshot (Index 23)  
+**Submission:** April 18, 2026
+
 ---
+
 ## Table of Contents
 
 1. [System Overview](#1-system-overview)
@@ -20,7 +25,7 @@
    - 3.11 [Lock-Free Thread-Safe Metrics](#311-lock-free-thread-safe-metrics)
    - 3.12 [Lai-Yang vs Chandy-Lamport](#312-lai-yang-vs-chandy-lamport--algorithm-selection-rationale)
 4. [Configuration Choices](#4-configuration-choices)
-5. [Experiment Generation And Results](#5-experiment-generation-and-results)
+5. [Experiment Results](#5-experiment-results)
    - 5.1 [Experiment 1 — No-Algorithm Baseline](#51-experiment-1--no-algorithm-baseline-smallgraph-5s)
    - 5.2 [Experiment 2 — Wave Algorithm](#52-experiment-2--wave-algorithm-smallgraph-30s)
    - 5.3 [Experiment 3 — Lai-Yang Snapshot](#53-experiment-3--lai-yang-snapshot-mediumgraph-60s)
@@ -31,6 +36,7 @@
 6. [Algorithm Correctness Arguments](#6-algorithm-correctness-arguments)
 7. [Known Limitations](#7-known-limitations)
 
+---
 
 ## 1. System Overview
 
@@ -38,9 +44,7 @@ This project implements a distributed algorithms simulator that converts randoml
 
 ---
 
-
-
-## Architecture
+## 2. Architecture
 
 ```
 NetGameSim (.ngs file)
@@ -86,9 +90,9 @@ GraphToActorMapper       ← Creates one NodeActor per node, wires ActorRefs
 
 ---
 
-## 2. Design Decisions
+## 3. Design Decisions
 
-### 2.1 One Actor Per Node (Not Router Pools)
+### 3.1 One Actor Per Node (Not Router Pools)
 
 Each graph node maps to exactly one `NodeActor` instance. This was the most consequential architectural decision. Router pools were explicitly rejected for the following reasons:
 
@@ -99,7 +103,7 @@ Each graph node maps to exactly one `NodeActor` instance. This was the most cons
 
 The correct mapping is: **one logical graph node = one Akka actor = one unique identity in the network**.
 
-### 2.2 Immutable State via `context.become`
+### 3.2 Immutable State via `context.become`
 
 `NodeActor` contains zero `var` fields. All mutable state is threaded through `context.become` as function parameters. The actor has two behaviors:
 
@@ -120,7 +124,7 @@ context.become(initialized(neighbors, allowedOnEdge, pdf, ctx, updatedQueue))
 
 This is the canonical Akka pattern for avoiding shared mutable state. Each "state snapshot" is a closure over the parameter values at that point in time — conceptually equivalent to an immutable event-sourced state machine.
 
-### 2.3 Algorithm Plugin Pattern
+### 3.3 Algorithm Plugin Pattern
 
 Algorithms implement a clean trait:
 
@@ -148,7 +152,7 @@ This means Wave and Lai-Yang run **simultaneously** on the same 101 actors in Ex
 
 `NodeContext` is a thin wrapper passed to algorithms containing the node's id, neighbor map, edge label map, and metrics handle — everything an algorithm needs to send messages, without exposing actor internals.
 
-### 2.4 Edge Label Enforcement
+### 3.4 Edge Label Enforcement
 
 Every directed edge carries a `Set[MessageType]` of allowed message types, computed by `GraphEnricher` from `application.conf` and stored in `allowedOnEdge: Map[Int, Set[MessageType]]` at each actor. Before any send, `sendToEligibleNeighbor` filters candidates:
 
@@ -169,7 +173,7 @@ eligible match
 
 The enforcement is verified empirically in every experiment. In Experiment 3 (Lai-Yang on MediumGraph), edge `35→9` denies PING — Node 35's only outgoing edge — producing exactly 476 PING drops, all traceable to that single restriction.
 
-### 2.5 500ms Startup Delay for Algorithm Initialization
+### 3.5 500ms Startup Delay for Algorithm Initialization
 
 All actors initialize concurrently at system boot. Without coordination, the initiator (Node 0) would call `onStart` immediately after its own `Init` — before the other 100 actors finish theirs. Algorithm markers (CONTROL type) sent to uninitialized actors hit the `uninitialized` behavior which only accepts `Init`, causing dead letters and lost protocol messages.
 
@@ -188,7 +192,7 @@ case StartAlgorithms =>
 
 The 500ms window is deliberately generous — even under JVM cold-start conditions, 101 actors finish their `Init` handling in well under 100ms. Zero dead-letter warnings appear in any experiment log, confirming the delay is sufficient.
 
-### 2.6 PING/ACK Request-Reply Protocol
+### 3.6 PING/ACK Request-Reply Protocol
 
 PING is a point-to-point health check. On receipt, the node attempts to send ACK back to the sender — but only if a reverse edge exists and allows ACK:
 
@@ -208,7 +212,7 @@ case MessageType.ACK =>
 
 This is topology-dependent by design. Because the graph is directed, edge `A→B` existing does not imply `B→A` exists. ACK is only possible when the physical reverse channel exists and its label permits it. In SmallGraph's tree-like topology, most PINGs are terminal — the sender verifies reachability but does not require confirmation. ACK is reserved in edge label defaults, enabling selective enablement per-edge via config overrides.
 
-### 2.7 GOSSIP One-Hop Epidemic Propagation
+### 3.7 GOSSIP One-Hop Epidemic Propagation
 
 GOSSIP implements classic epidemic dissemination. Each hop forwards to exactly one random eligible neighbor, excluding the sender to prevent immediate bounce-back:
 
@@ -228,7 +232,7 @@ case MessageType.GOSSIP =>
 
 Every GOSSIP message generates one more GOSSIP message (until it reaches a dead end), producing cascading chains. This explains why GOSSIP dominates traffic volume in every experiment — in LargeGraph with 138 edges, a single GOSSIP tick from Node 0 can cascade through many hops, compounding over 120 seconds into 27,740 messages.
 
-### 2.8 WORK Cascade with Probabilistic Delegation
+### 3.8 WORK Cascade with Probabilistic Delegation
 
 WORK models task delegation chains. On receipt, the node enqueues the task and then with 50% probability delegates it to a random eligible neighbor:
 
@@ -246,7 +250,7 @@ private def processWork(queue, neighbors, allowedOnEdge): (List[String], Boolean
 
 The 50% branching factor means WORK chains are geometrically distributed in length — expected 2 hops before stopping. This produces substantially lower WORK volume than GOSSIP (which always forwards one hop) but more than PING (which is terminal). In the no-algo baseline, WORK is 16% of traffic vs GOSSIP at 64%.
 
-### 2.9 Configuration-Driven Design with Zero Hardcoded Values
+### 3.9 Configuration-Driven Design with Zero Hardcoded Values
 
 No values are hardcoded in source. Everything comes from `application.conf`:
 
@@ -287,11 +291,11 @@ sim {
 
 CLI flags `--graph`, `--run`, and `--config` override `application.conf` at runtime. Experiment 6 loads an entirely different config file (`application-exp2.conf`) via `--config` without touching any source file, demonstrating full config-driven reconfiguration.
 
-### 2.10 Reproducibility via Fixed Random Seeds
+### 3.10 Reproducibility via Fixed Random Seeds
 
 `PdfSampler(seed)` wraps `scala.util.Random(seed)`. Given the same seed, the identical sequence of message types is generated on every run, regardless of machine or JVM. Experiments use seed 999 (default config) and seed 42 (Experiment 6 config). Results are fully reproducible on any machine running Java 17.
 
-### 2.11 Lock-Free Thread-Safe Metrics
+### 3.11 Lock-Free Thread-Safe Metrics
 
 `MetricsCollector` uses `concurrent.TrieMap[String, AtomicLong]` for all counters. Multiple actors on different dispatcher threads update metrics concurrently with no locking:
 
@@ -302,7 +306,7 @@ def recordSent(from: Int, to: Int, kind: MessageType): Unit =
 
 `AtomicLong.incrementAndGet()` is a single hardware CAS operation — lock-free and wait-free under any concurrency. `TrieMap` provides lock-free concurrent insertion for new counter keys. The final report is printed from the main thread after all actors stop, so no synchronization is needed at report time.
 
-### 2.12 Lai-Yang vs Chandy-Lamport — Algorithm Selection Rationale
+### 3.12 Lai-Yang vs Chandy-Lamport — Algorithm Selection Rationale
 
 This was a deliberate algorithm selection, not a default choice.
 
@@ -320,7 +324,7 @@ These captures at shutdown confirm WHITE messages in transit at the moment of RE
 
 ---
 
-## 3. Configuration Choices
+## 4. Configuration Choices
 
 ### Graph Files
 
@@ -352,13 +356,13 @@ Only explicitly listed timer nodes generate traffic autonomously. All other node
 
 ---
 
-## 4. Experiment Generation And Results
+## 5. Experiment Results
 
 **Environment:** MacBook Pro M2, macOS 14, Java 17.0.16 (Homebrew), Scala 3.3.1, Akka 2.8.5, sbt 1.9.7.
 
 ---
 
-### Experiment 1 — No-Algorithm Baseline (SmallGraph, 5s)
+### 5.1 Experiment 1 — No-Algorithm Baseline (SmallGraph, 5s)
 
 **Command:**
 ```bash
@@ -390,7 +394,7 @@ Total messages sent:    513     dropped: 0
 
 ---
 
-### Experiment 2 — Wave Algorithm (SmallGraph, 30s)
+### 5.2 Experiment 2 — Wave Algorithm (SmallGraph, 30s)
 
 **Command:**
 ```bash
@@ -424,7 +428,7 @@ Total messages sent:    2746    dropped: 0
 
 ---
 
-### Experiment 3 — Lai-Yang Snapshot (MediumGraph, 60s)
+### 5.3 Experiment 3 — Lai-Yang Snapshot (MediumGraph, 60s)
 
 **Command:**
 ```bash
@@ -464,7 +468,7 @@ Total messages sent:    9320    dropped: 476
 
 ---
 
-### Experiment 4 — Both Algorithms (LargeGraph, 120s)
+### 5.4 Experiment 4 — Both Algorithms (LargeGraph, 120s)
 
 **Command:**
 ```bash
@@ -506,7 +510,7 @@ Total messages sent:    31993   dropped: 11
 
 ---
 
-### Experiment 5 — File-Driven Injection (LargeGraph, 30s)
+### 5.5 Experiment 5 — File-Driven Injection (LargeGraph, 30s)
 
 **Command:**
 ```bash
@@ -543,7 +547,7 @@ Total messages sent:    8059    dropped: 4
 
 ---
 
-### Experiment 6 — Strict Config Override (SmallGraph, 30s, Both Algorithms)
+### 5.6 Experiment 6 — Strict Config Override (SmallGraph, 30s, Both Algorithms)
 
 **Command:**
 ```bash
@@ -578,7 +582,7 @@ Total messages sent:    1610    dropped: 725
 
 ---
 
-## 5. Experiment Summary Table
+### 5.7 Experiment Summary Table
 
 | # | Graph | Nodes/Edges | Algorithm | Seed | Duration | Sent | Dropped | CONTROL | Key Finding |
 |---|-------|-------------|-----------|------|----------|------|---------|---------|-------------|
@@ -592,8 +596,6 @@ Total messages sent:    1610    dropped: 725
 **CONTROL invariant:** In every experiment with algorithms, CONTROL = (graph edges) × (number of active algorithms). This is mathematical verification that both Wave and Lai-Yang propagated correctly through every edge in the topology.
 
 ---
-
-
 
 ## 6. Algorithm Correctness Arguments
 
