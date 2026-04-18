@@ -2,12 +2,42 @@
 
 **Student:** Shivam Moudgil 
 ---
+## Table of Contents
+
+1. [System Overview](#1-system-overview)
+2. [Architecture](#2-architecture)
+3. [Design Decisions](#3-design-decisions)
+   - 3.1 [One Actor Per Node](#31-one-actor-per-node-not-router-pools)
+   - 3.2 [Immutable State via context.become](#32-immutable-state-via-contextbecome)
+   - 3.3 [Algorithm Plugin Pattern](#33-algorithm-plugin-pattern)
+   - 3.4 [Edge Label Enforcement](#34-edge-label-enforcement)
+   - 3.5 [500ms Startup Delay](#35-500ms-startup-delay-for-algorithm-initialization)
+   - 3.6 [PING/ACK Request-Reply Protocol](#36-pingack-request-reply-protocol)
+   - 3.7 [GOSSIP One-Hop Epidemic Propagation](#37-gossip-one-hop-epidemic-propagation)
+   - 3.8 [WORK Cascade with Probabilistic Delegation](#38-work-cascade-with-probabilistic-delegation)
+   - 3.9 [Configuration-Driven Design](#39-configuration-driven-design-with-zero-hardcoded-values)
+   - 3.10 [Reproducibility via Fixed Seeds](#310-reproducibility-via-fixed-random-seeds)
+   - 3.11 [Lock-Free Thread-Safe Metrics](#311-lock-free-thread-safe-metrics)
+   - 3.12 [Lai-Yang vs Chandy-Lamport](#312-lai-yang-vs-chandy-lamport--algorithm-selection-rationale)
+4. [Configuration Choices](#4-configuration-choices)
+5. [Experiment Generation And Results](#5-experiment-generation-and-results)
+   - 5.1 [Experiment 1 — No-Algorithm Baseline](#51-experiment-1--no-algorithm-baseline-smallgraph-5s)
+   - 5.2 [Experiment 2 — Wave Algorithm](#52-experiment-2--wave-algorithm-smallgraph-30s)
+   - 5.3 [Experiment 3 — Lai-Yang Snapshot](#53-experiment-3--lai-yang-snapshot-mediumgraph-60s)
+   - 5.4 [Experiment 4 — Both Algorithms](#54-experiment-4--both-algorithms-largegraph-120s)
+   - 5.5 [Experiment 5 — File-Driven Injection](#55-experiment-5--file-driven-injection-largegraph-30s)
+   - 5.6 [Experiment 6 — Strict Config Override](#56-experiment-6--strict-config-override-smallgraph-30s)
+   - 5.7 [Experiment Summary Table](#57-experiment-summary-table)
+6. [Algorithm Correctness Arguments](#6-algorithm-correctness-arguments)
+7. [Known Limitations](#7-known-limitations)
+
 
 ## 1. System Overview
 
 This project implements a distributed algorithms simulator that converts randomly generated graphs from NetGameSim into a running Akka actor system. Each graph node becomes one Akka Classic actor, and each directed edge becomes a communication channel modeled via a destination `ActorRef`. Two distributed algorithms — Wave and Lai-Yang Snapshot — are implemented as pluggable modules that run on top of the same actor runtime.
 
 ---
+
 
 
 ## Architecture
@@ -322,7 +352,7 @@ Only explicitly listed timer nodes generate traffic autonomously. All other node
 
 ---
 
-## 4. Experiment Results
+## 4. Experiment Generation And Results
 
 **Environment:** MacBook Pro M2, macOS 14, Java 17.0.16 (Homebrew), Scala 3.3.1, Akka 2.8.5, sbt 1.9.7.
 
