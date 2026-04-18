@@ -480,8 +480,6 @@ sbt "runMain com.uic.cs553.distributed.simcli.SimMain --config src/main/resource
 
 1. **Snapshot termination detection:** Per-node completion detection only. A full global coordinator collecting all local snapshots is not implemented.
 
-2. **Cinnamon metrics:** The Lightbend Cinnamon plugin requires a commercial license token. Built-in `MetricsCollector` via `TrieMap[key, AtomicLong]` provides equivalent per-type counters.
+2. **Single-machine simulation:** All actors run in one JVM. Akka Cluster is a dependency but cluster configuration is not set up in this submission.
 
-3. **Single-machine simulation:** All actors run in one JVM. Akka Cluster is a dependency but cluster configuration is not set up in this submission.
-
-4. **ACK topology dependency:** PING→ACK replies only succeed when a reverse edge exists. In SmallGraph's tree-like structure, most edges are one-directional.
+3. **ACK topology dependency:** PING→ACK replies only succeed when a reverse edge exists. In SmallGraph's tree-like structure, most edges are one-directional.
