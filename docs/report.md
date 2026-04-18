@@ -25,7 +25,7 @@
    - 3.11 [Lock-Free Thread-Safe Metrics](#311-lock-free-thread-safe-metrics)
    - 3.12 [Lai-Yang vs Chandy-Lamport](#312-lai-yang-vs-chandy-lamport--algorithm-selection-rationale)
 4. [Configuration Choices](#4-configuration-choices)
-5. [Experiment Results](#5-experiment-results)
+5. [Experiment Generation And Results](#5-experiment-genaration-and-results)
    - 5.1 [Experiment 1 — No-Algorithm Baseline](#51-experiment-1--no-algorithm-baseline-smallgraph-5s)
    - 5.2 [Experiment 2 — Wave Algorithm](#52-experiment-2--wave-algorithm-smallgraph-30s)
    - 5.3 [Experiment 3 — Lai-Yang Snapshot](#53-experiment-3--lai-yang-snapshot-mediumgraph-60s)
@@ -356,7 +356,7 @@ Only explicitly listed timer nodes generate traffic autonomously. All other node
 
 ---
 
-## 5. Experiment Results
+## 5. Experiment Generation And Results
 
 **Environment:** MacBook Pro M2, macOS 14, Java 17.0.16 (Homebrew), Scala 3.3.1, Akka 2.8.5, sbt 1.9.7.
 
