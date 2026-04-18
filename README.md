@@ -1,5 +1,6 @@
 # CS553 Distributed Algorithms Simulator
 # Youtube video: https://www.youtube.com/watch?v=FNe1j0h5-68
+# Report-- https://github.com/its-Shivam732/CS553-DistributedAlgorithms/blob/main/docs/report.md
 
 ---
 
