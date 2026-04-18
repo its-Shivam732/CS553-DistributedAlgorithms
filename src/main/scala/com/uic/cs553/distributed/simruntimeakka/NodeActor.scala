@@ -99,6 +99,8 @@ final class NodeActor(
 
         case MessageType.WORK =>
           // WORK cascades with 50% probability — models task delegation chains.
+          // Each node that receives WORK may pass it further down the graph.
+          // Uses a workQueue to process one item per receive — actor-safe.
           val newQueue = payload :: workQueue
           val (updatedQueue, _) = processWork(newQueue, neighbors, allowedOnEdge)
           context.become(initialized(neighbors, allowedOnEdge, pdf, ctx, updatedQueue))
@@ -123,9 +125,21 @@ final class NodeActor(
               logger.debug(s"Node $id: forwarded GOSSIP to Node $to")
 
         case MessageType.PING =>
-          // PING is terminal — models point-to-point health checks.
-          // Sender checks if receiver is alive, no cascade needed.
-          logger.debug(s"Node $id: PING from $from — terminal, no forwarding")
+          // PING is a health check — attempt to send ACK back to sender.
+          // ACK is only possible if a reverse edge exists (from→sender)
+          // AND that edge's label allows ACK. In a directed graph, the
+          // forward edge (sender→us) does not guarantee a reverse edge.
+          // If no reverse path exists, PING is silently terminal.
+          logger.debug(s"Node $id: PING from $from — sending ACK if possible")
+          val canAck = neighbors.contains(from) &&
+            allowedOnEdge.getOrElse(from, Set.empty).contains(MessageType.ACK)
+          if canAck then
+            neighbors(from) ! Envelope(from = id, kind = MessageType.ACK,
+              payload = s"ack-from-$id")
+            metrics.recordSent(id, from, MessageType.ACK)
+            logger.debug(s"Node $id: ACK sent to Node $from")
+          else
+            logger.debug(s"Node $id: no reverse edge to $from or ACK blocked — PING terminal")
 
         case MessageType.CONTROL =>
           // CONTROL handled entirely by algorithm modules via onMessage above.
@@ -133,8 +147,9 @@ final class NodeActor(
           ()
 
         case MessageType.ACK =>
-          // ACK reserved for future use — terminal at receiver.
-          logger.debug(s"Node $id: ACK from $from — terminal")
+          // ACK is the reply to a PING — confirms the sender is alive.
+          // Terminal at receiver — no further forwarding needed.
+          logger.debug(s"Node $id: ACK from $from — node $from is alive")
 
     case AlgorithmMsg(from, algName, payload) =>
       algorithms
