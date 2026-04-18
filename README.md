@@ -180,16 +180,7 @@ GraphToActorMapper       ← Creates one NodeActor per node, wires ActorRefs
   MetricsCollector       ← Sent/dropped per message type, final report
 ```
 
-### Key Design Principles
-
-- **One actor per node** — not router pools. Each actor owns independent state, preventing data inconsistency.
-- **Edge labels enforced at send time** — `NodeActor.sendToEligibleNeighbor()` checks `allowedOnEdge` before every send. Forbidden messages are dropped and counted.
-- **Immutable state via `context.become`** — `NodeActor` uses `context.become(initialized(...))` to pass state as parameters rather than `var` fields.
-- **Algorithm plugin pattern** — algorithms implement `DistributedAlgorithm` trait (`onStart`, `onMessage`, `onTick`) and are injected into actors at boot time.
-- **Config-driven** — all parameters (graph path, seed, duration, PDFs, timers, algorithms) come from `application.conf`. Nothing is hardcoded.
-
 ---
-
 ## Key Source Files
 
 ### `NodeActor.scala`
