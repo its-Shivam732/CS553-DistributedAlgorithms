@@ -1,7 +1,5 @@
 # CS553 Distributed Algorithms Simulator
-**Student:** Shivam Moudgil | **UIN:** 665599956  
-**Course:** CS553 — Distributed Computing Systems, Spring 2026  
-**Algorithms:** Wave Algorithm (Index 13) · Lai-Yang Snapshot (Index 23)
+**Youtube video:** https://www.youtube.com/watch?v=FNe1j0h5-68
 
 ---
 
@@ -332,11 +330,11 @@ sbt "runMain com.uic.cs553.distributed.simcli.SimMain --config src/main/resource
 | # | Graph | Algorithm | Sent | Dropped | CONTROL |
 |---|-------|-----------|------|---------|---------|
 | 1 | Small 21n/20e | None | 513 | 0 | 0 |
-| 2 | Small 21n/20e | Wave | 2,746 | 0 | 20 ✅ |
-| 3 | Medium 51n/54e | Lai-Yang | 9,320 | 476 PING | 54 ✅ |
-| 4 | Large 101n/138e | Both | 31,993 | 11 WORK | 275 ✅ |
-| 5 | Large 101n/138e | Both + inject | 8,059 | 4 WORK | 275 ✅ |
-| 6 | Small 21n/20e | Both, strict | 1,610 | 724 GOSSIP | 40 ✅ |
+| 2 | Small 21n/20e | Wave | 2,746 | 0 | 20  |
+| 3 | Medium 51n/54e | Lai-Yang | 9,320 | 476 PING | 54  |
+| 4 | Large 101n/138e | Both | 31,993 | 11 WORK | 275  |
+| 5 | Large 101n/138e | Both + inject | 8,059 | 4 WORK | 275  |
+| 6 | Small 21n/20e | Both, strict | 1,610 | 724 GOSSIP | 40  |
 
 CONTROL always equals (graph edges) × (number of active algorithms) — mathematical proof of correct propagation. Full analysis in `docs/report.md`.
 
@@ -445,11 +443,11 @@ Every run prints a final report to stdout. Actual results across all 6 experimen
 Exp  Graph          Algorithm        Dur   Sent    Drop  CONTROL  PING     GOSSIP   WORK
 ─────────────────────────────────────────────────────────────────────────────────────
 1    Small 21n/20e  None             5s    513     0     0        99       330      84
-2    Small 21n/20e  Wave             30s   2,746   0     20✅     674      1,760    294
-3    Medium 51n/54e Lai-Yang         60s   9,320   476   54✅     838(476↓)7,775    653
-4    Large 101n/138e Both            120s  31,993  11    275✅    2,613    27,740   1,365(11↓)
-5    Large 101n/138e Both + inject   30s   8,059   4     275✅    663      6,822    299(4↓)
-6    Small 21n/20e  Both, strict     30s   1,610   725   40✅     0        0(724↓) 1,570
+2    Small 21n/20e  Wave             30s   2,746   0     20     674      1,760    294
+3    Medium 51n/54e Lai-Yang         60s   9,320   476   54    838(476↓)7,775    653
+4    Large 101n/138e Both            120s  31,993  11    275   2,613    27,740   1,365(11↓)
+5    Large 101n/138e Both + inject   30s   8,059   4     275    663      6,822    299(4↓)
+6    Small 21n/20e  Both, strict     30s   1,610   725   40    0        0(724↓) 1,570
 ─────────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -457,11 +455,11 @@ Exp  Graph          Algorithm        Dur   Sent    Drop  CONTROL  PING     GOSSI
 
 | Experiment | Graph edges | Algorithms | CONTROL | Verified |
 |-----------|-------------|------------|---------|----------|
-| Exp 2 | 20 | Wave (×1) | 20 | ✅ |
-| Exp 3 | 54 | Lai-Yang (×1) | 54 | ✅ |
-| Exp 4 | 138 | Both (×2) | 275 | ✅ |
-| Exp 5 | 138 | Both (×2) | 275 | ✅ |
-| Exp 6 | 20 | Both (×2) | 40 | ✅ |
+| Exp 2 | 20 | Wave (×1) | 20 |  |
+| Exp 3 | 54 | Lai-Yang (×1) | 54 |  |
+| Exp 4 | 138 | Both (×2) | 275 |  |
+| Exp 5 | 138 | Both (×2) | 275 |  |
+| Exp 6 | 20 | Both (×2) | 40 |  |
 
 CONTROL always equals (graph edges) × (number of active algorithms) — mathematical proof that both Wave and Lai-Yang propagated through every edge in the topology.
 
@@ -480,29 +478,7 @@ All counters use `TrieMap` + `AtomicLong` for lock-free concurrent updates acros
 
 ## Cinnamon Instrumentation
 
-The Lightbend Cinnamon sbt plugin (v2.21.4) is configured in `project/plugins.sbt`. Actor instrumentation config is present in `application.conf`. Full activation requires a Lightbend commercial license token from `account.akka.io/token`. The built-in `MetricsCollector` provides equivalent per-message-type counters with no external dependency.
-
----
-
-## Design Decisions
-
-### Why one actor per node (not router pools)?
-Each graph node has independent algorithm state — wave phase, snapshot color, pending ACK count. Router pools share state across instances, breaking algorithm correctness. One actor = one unique identity = one consistent state.
-
-### Why `context.become` instead of `var`?
-`NodeActor` uses `context.become(initialized(neighbors, pdf, ctx, workQueue))` to pass all mutable state as immutable function parameters, avoiding `var` entirely for operational state. This is the canonical Akka pattern for stateful actors without shared mutable state.
-
-### Why Lai-Yang over Chandy-Lamport?
-Akka's dispatcher does not guarantee FIFO ordering across concurrent threads. Chandy-Lamport requires FIFO channels. Lai-Yang uses message coloring instead — RED nodes capture any WHITE message as in-flight, regardless of arrival order.
-
-### Why 500ms startup delay?
-All actors initialize concurrently. Without a delay, the initiator sends algorithm markers before other actors finish `Init`, causing dead letters. A 500ms `scheduleOnce` on every actor ensures all actors are in `initialized` state before any algorithm starts.
-
-### Why CONTROL always allowed on all edges?
-Algorithm protocol messages must propagate regardless of application-level edge restrictions. `GraphEnricher` force-adds CONTROL to every edge's allowed set. Algorithms operate at infrastructure level, above application traffic policy.
-
-### Why Akka Classic (not Typed)?
-`context.become` is the natural fit for the immutable state machine patterns required by Wave and Lai-Yang. Akka Typed requires explicit behavior definitions per state, adding boilerplate for what is fundamentally a behavior-switching pattern.
+The Lightbend Cinnamon sbt plugin (v2.21.4) is configured in `project/plugins.sbt`, build.sbt.
 
 ---
 
