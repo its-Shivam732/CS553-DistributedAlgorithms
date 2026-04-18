@@ -19,7 +19,7 @@
 12. [Algorithms](#algorithms)
 13. [Metrics & Observability](#metrics--observability)
 14. [Cinnamon Instrumentation](#cinnamon-instrumentation)
-15. [Design Decisions](#design-decisions)
+15. [Versions](#versions)
 
 ---
 
