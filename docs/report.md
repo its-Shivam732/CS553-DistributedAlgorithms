@@ -34,7 +34,7 @@
    - 5.6 [Experiment 6 — Strict Config Override](#56-experiment-6--strict-config-override-smallgraph-30s)
    - 5.7 [Experiment Summary Table](#57-experiment-summary-table)
 6. [Algorithm Correctness Arguments](#6-algorithm-correctness-arguments)
-7. [Known Limitations](#7-known-limitations)
+
 
 ---
 
@@ -587,11 +587,11 @@ Total messages sent:    1610    dropped: 725
 | # | Graph | Nodes/Edges | Algorithm | Seed | Duration | Sent | Dropped | CONTROL | Key Finding |
 |---|-------|-------------|-----------|------|----------|------|---------|---------|-------------|
 | 1 | Small | 21n/20e | None | 999 | 5s | 513 | 0 | 0 | Pure traffic baseline |
-| 2 | Small | 21n/20e | Wave | 999 | 30s | 2,746 | 0 | **20** ✅ | CONTROL = edges |
-| 3 | Medium | 51n/54e | Lai-Yang | 999 | 60s | 9,320 | 476 PING | **54** ✅ | CONTROL = edges; drops from edge 35→9 |
-| 4 | Large | 101n/138e | Both | 999 | 120s | 31,993 | 11 WORK | **275** ✅ | 87% GOSSIP, both algos concurrent |
-| 5 | Large | 101n/138e | Both + inject | 999 | 30s | 8,059 | 4 WORK | **275** ✅ | 4 injection entries confirmed |
-| 6 | Small | 21n/20e | Both | 42 | 30s | 1,610 | 724 GOSSIP | **40** ✅ | CONTROL = 20×2; GOSSIP fully blocked |
+| 2 | Small | 21n/20e | Wave | 999 | 30s | 2,746 | 0 | **20**  | CONTROL = edges |
+| 3 | Medium | 51n/54e | Lai-Yang | 999 | 60s | 9,320 | 476 PING | **54**  | CONTROL = edges; drops from edge 35→9 |
+| 4 | Large | 101n/138e | Both | 999 | 120s | 31,993 | 11 WORK | **275**  | 87% GOSSIP, both algos concurrent |
+| 5 | Large | 101n/138e | Both + inject | 999 | 30s | 8,059 | 4 WORK | **275**  | 4 injection entries confirmed |
+| 6 | Small | 21n/20e | Both | 42 | 30s | 1,610 | 724 GOSSIP | **40** | CONTROL = 20×2; GOSSIP fully blocked |
 
 **CONTROL invariant:** In every experiment with algorithms, CONTROL = (graph edges) × (number of active algorithms). This is mathematical verification that both Wave and Lai-Yang propagated correctly through every edge in the topology.
 
@@ -622,13 +622,3 @@ The Echo Algorithm satisfies the three wave algorithm properties:
 **System assumption match:** Akka's thread-pool dispatcher does not guarantee FIFO ordering. Lai-Yang's coloring handles this explicitly. Chandy-Lamport would produce incorrect snapshots in this runtime.
 
 ---
-
-## 7. Known Limitations
-
-1. **Global snapshot termination detection.** Per-node completion is detected. A global coordinator collecting all local snapshots and announcing global completion is not implemented — would require an additional message round.
-
-2. **Cinnamon metrics.** The Lightbend Cinnamon plugin is declared but requires a commercial license. The built-in `MetricsCollector` provides equivalent per-type counters with no external dependency.
-
-3. **Single-JVM simulation.** All actors run in one JVM. The architecture is compatible with Akka Cluster but multi-node deployment is not configured. Network partitions and true propagation delays are not simulated.
-
-4. **ACK topology dependency.** PING/ACK round-trip requires a reverse edge allowing ACK. In directed topologies this is not guaranteed. A future enhancement could add a dedicated reply-path mechanism independent of graph edges.
