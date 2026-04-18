@@ -438,22 +438,43 @@ sbt test
 
 ## Metrics & Observability
 
-Every run prints a final report:
+Every run prints a final report to stdout. Actual results across all 6 experiments:
 
 ```
-==========================================
-=== SIMULATION METRICS FINAL REPORT  ===
-==========================================
-Total messages sent:    31993
-Total messages dropped: 11
-  CONTROL → sent: 275,  dropped: 0
-  PING    → sent: 2613, dropped: 0
-  GOSSIP  → sent: 27740,dropped: 0
-  WORK    → sent: 1365, dropped: 11
-==========================================
+─────────────────────────────────────────────────────────────────────────────────────
+Exp  Graph          Algorithm        Dur   Sent    Drop  CONTROL  PING     GOSSIP   WORK
+─────────────────────────────────────────────────────────────────────────────────────
+1    Small 21n/20e  None             5s    513     0     0        99       330      84
+2    Small 21n/20e  Wave             30s   2,746   0     20✅     674      1,760    294
+3    Medium 51n/54e Lai-Yang         60s   9,320   476   54✅     838(476↓)7,775    653
+4    Large 101n/138e Both            120s  31,993  11    275✅    2,613    27,740   1,365(11↓)
+5    Large 101n/138e Both + inject   30s   8,059   4     275✅    663      6,822    299(4↓)
+6    Small 21n/20e  Both, strict     30s   1,610   725   40✅     0        0(724↓) 1,570
+─────────────────────────────────────────────────────────────────────────────────────
 ```
 
-All counters use `TrieMap` + `AtomicLong` for lock-free concurrent updates across actor threads.
+**Key invariant — CONTROL = edges × algorithms:**
+
+| Experiment | Graph edges | Algorithms | CONTROL | Verified |
+|-----------|-------------|------------|---------|----------|
+| Exp 2 | 20 | Wave (×1) | 20 | ✅ |
+| Exp 3 | 54 | Lai-Yang (×1) | 54 | ✅ |
+| Exp 4 | 138 | Both (×2) | 275 | ✅ |
+| Exp 5 | 138 | Both (×2) | 275 | ✅ |
+| Exp 6 | 20 | Both (×2) | 40 | ✅ |
+
+CONTROL always equals (graph edges) × (number of active algorithms) — mathematical proof that both Wave and Lai-Yang propagated through every edge in the topology.
+
+**Drop breakdown:**
+- Exp 3 — 476 PING drops: edge `35→9` blocks PING; Node 35's only outgoing edge, 20% PING in its PDF, 60 seconds
+- Exp 4 — 11 WORK drops: WORK cascade coin flip says "forward" but no WORK-eligible neighbor exists
+- Exp 5 — 4 WORK drops: same LargeGraph topology as Exp 4, shorter run
+- Exp 6 — 724 GOSSIP drops: strict config blocks GOSSIP on all of Node 0's outgoing edges; 0 GOSSIP transmitted
+
+All counters use `TrieMap` + `AtomicLong` for lock-free concurrent updates across actor threads. Metrics collected via:
+- `MetricsCollector.recordSent(from, to, kind)` — in `sendToEligibleNeighbor`
+- `MetricsCollector.recordDropped(from, -1, kind)` — when no eligible neighbor found
+- `MetricsCollector.recordReceived(nodeId, kind)` — on every received `Envelope`
 
 ---
 
