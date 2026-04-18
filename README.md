@@ -398,11 +398,8 @@ sbt test
 | `SimGraphTest` | Graph topology operations (neighbors, hasEdge, counts) |
 | `WaveAlgorithmTest` | Wave initiator sends on start, AlgorithmRegistry flags |
 | `NodeActorTest` | Actor init, ExternalInput forwarding, edge label blocking, metrics |
-| `DistributedNodeSpec` | Prof-provided framework base class tests |
 | `LaiYangSnapshotTest` | Snapshot initiator sends CONTROL, non-initiator stays quiet |
-| `GraphEnricherSerializerTest` | Enrich assigns labels/PDFs, round-trip JSON serialize/deserialize |
 | `FileDrivenInjectorTest` | Parse injection scripts, skip comments, inject correct types |
-| `GraphToActorMapperTest` | Creates correct actor count, all ActorRefs distinct and live |
 
 ---
 
